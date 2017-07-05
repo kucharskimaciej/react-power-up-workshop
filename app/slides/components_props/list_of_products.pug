@@ -1,0 +1,57 @@
+extends ~layouts/columns
+
+block title
+    | List of products
+
+block content
+    +slide_column(70)
+        +code('src/App.js', 'javascript')
+            :escape
+                function App() {
+                    const products = [
+                        {
+                          name: "JavaScript: The Definitive Guide",
+                          description: `Since 1996, JavaScript: The Definitive Guide...`,
+                          price: 28.89
+                        },
+                        {
+                          name: "Eloquent JavaScript",
+                          description: `JavaScript lies at the heart...`,
+                          price: 21.22
+                        },
+                        {
+                          name: "JavaScript: The Good Parts",
+                          description: `Most programming languages...`,
+                          price: 16.59
+                        }
+                    ]
+
+                    return (
+                        <section>
+                            <h1>Products</h1>
+                            { products.map(product => (
+                                <div>
+                                    <header>{ product.name }</header>
+                                    <p>
+                                        { product.description }
+                                    </p>
+                                    <span>{ product.price }$</span>
+                                </div>
+                            )) }
+                        </section>
+                    )
+                }
+
+    +slide_column()
+        .l-column-fit
+            .l-island
+                +code_focus('2-19').current-only
+                    :markdown-it
+                        Instead of one product our model is now a list of products
+
+                +code_focus('23-31').current-only
+                    :markdown-it
+                        Use the `Array.map` method to iterate over product and create JSX for each of them
+
+            img(src=require('slides/components_props/list_of_products.png')).l-island
+

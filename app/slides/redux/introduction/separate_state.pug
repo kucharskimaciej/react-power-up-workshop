@@ -1,0 +1,25 @@
+extends ~layouts/columns
+
+block title
+    | Separate state from UI
+
+block content
+
+    +slide_column().l-column-middle
+        .l-column-fit
+            img(src=require('slides/redux/introduction/separate_state.png'))
+
+    +slide_column().l-column-middle
+        .l-column-fit
+            +fragment().current-only
+                :markdown-it
+                    One of the solutions is to move the application state away from it's view layer (aka components).
+
+            +fragment().current-only
+                :markdown-it
+                    All of the data will be kept in an object accesible by every component.
+
+            +fragment().current-only
+                :markdown-it
+                    Components will be able to modify the state using events.
+

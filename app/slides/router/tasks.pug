@@ -1,0 +1,19 @@
+extends ~layouts/columns
+
+block title
+    | Module #4 Tasks
+
+block content
+    +slide_column()
+        .l-column-fit
+            +task('basic')
+                | Setup the Router with two pages: home page with title and message and contact list page (the current view)
+
+            +task('basic')
+                | Create navigation component with links that displays on both pages
+
+            +task('optional')
+                | The active link should be visually distinct
+
+            +task('optional')
+                | Add a route for single contact page

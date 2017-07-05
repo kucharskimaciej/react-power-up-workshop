@@ -1,0 +1,34 @@
+extends ~layouts/columns
+
+block title
+    | Multiple and asynchronous actions
+
+block content
+    +slide_column(50)
+        +code(null, 'javascript')
+            include:escape ./timer.js
+
+    +slide_column(50).l-column-middle
+        +code_focus('1').current-only
+            :markdown-it
+                Imports and setup of store and middleware - just as before
+
+        +code_focus('3-9').current-only
+            :markdown-it
+                Define regular, synchronous action creators
+
+        +code_focus('11-19').current-only
+            :markdown-it
+                Create a thunk that takes in one argument
+
+        +code_focus('17').current-only
+            :markdown-it
+                At first it will dispatch the `TIMER_START` action
+
+        +code_focus('13-15').current-only
+            :markdown-it
+                After the delay, dispatch `TIMER_END` action
+
+        +code_focus('21').current-only
+            :markdown-it
+                Still dispatches like a regular action

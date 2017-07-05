@@ -1,0 +1,38 @@
+extends ~layouts/columns
+
+block title
+    | Thunks in Redux - setup and basic usage
+
+block content
+    +slide_column(50)
+        +code(null, 'javascript')
+            include:escape ./thunks-in-redux.js
+
+    +slide_column(50).l-column-middle
+        +code_focus('1').current-only
+            :markdown-it
+                Import standard methods from `redux`.
+
+        +code_focus('2').current-only
+            :markdown-it
+                The `redux-thunk` library provides a middleware
+
+        +code_focus('4-7').current-only
+            :markdown-it
+                Create a store providing reducers (out of slide) and applying thunk middleware
+
+        +code_focus('9-11').current-only
+            :markdown-it
+                Very simple action creator
+
+        +code_focus('9-11').current-only
+            :markdown-it
+                `hello` is a function that will return a thunk - it's here for the purpose of creating a closure over `name` argument
+
+        +code_focus('14-16').current-only
+            :markdown-it
+                Thanks to the `thunk` middleware, the thunk will actually get the store's `dispatch` function as first argument.
+
+        +code_focus('15').current-only
+            :markdown-it
+                Use the `dispatch` to dispatch `greet` action.

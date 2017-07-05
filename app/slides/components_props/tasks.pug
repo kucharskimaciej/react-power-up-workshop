@@ -1,0 +1,19 @@
+extends ~layouts/columns
+
+block title
+    | Module #2 Tasks
+
+block content
+    +slide_column()
+        .l-column-fit
+            +task('basic')
+                | Create a single contact component
+
+            +task('basic')
+                | Create a component for list of contacts
+
+            +task('optional')
+                | Add tags to the contact component
+
+            +task('optional')
+                | Mark some contacts as favourites and show them on separate list
