@@ -417,12 +417,70 @@ function reducer(state = defaultState, action) {
 </div><div class="current-only fragment dm-code-focus" data-code-focus="12"><p><strong>Never</strong> <code>set</code> or <code>push</code> mutable object to otherwise immutable structure.
 Regular objects need to be converted to immutable with proper constructor function.
 When in doubt use <code>fromJS</code>. <code>merge</code> and <code>mergeDeep</code> are safe too.</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux-saga<small class="dm-slide__title__subtitle">Typed Javascript with Flow</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setting up the store</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript"></code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>Install required packages</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="10"><p>Create a socket connection using the <code>socket.io</code> library</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="11"><p>Create the middleware for handling sockets. It takes the socket as first argument.</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="11"><p>The second argument is the <em>socket action prefix</em>:
-in this example, all actions prefixed with <code>SERVER/</code> (<code>SERVER/ADD_TODO</code>, etc) will emit a message through the socket</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="13-16"><p>Standard store setup</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux-saga<small class="dm-slide__title__subtitle">Typed Javascript with Flow</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setting up</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">// npm install --save redux-saga
+
+import { createStore, applyMiddleware } from &#39;redux&#39;
+
+import createSagaMiddleware from &#39;redux-saga&#39;;
+const sagaMiddleware = createSagaMiddleware();
+
+const store = createStore(
+    /* reducer, */
+    applyMiddleware(sagaMiddleware)
+);
+
+function* greeterSaga() {
+    console.log(&#39;Greetings!&#39;)
+}
+
+sagaMiddleware.run(greeterSaga);
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Install the <code>redux-saga</code> package</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5-6"><p>Import and create the middlewares for handling sagas</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8-11"><p>Create the store as usual, passing in the middleware</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13-15"><Sagas>are generator functions</Sagas></div><div class="current-only fragment dm-code-focus" data-code-focus="14"><p>This particular saga does nothing but say 'Greetings!' every time an action is dispatched to the store</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="17"><p>Start the saga</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setting up</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** ACTION CREATORS **/
+function timerStart(time) {
+    return { type: &#39;TIMER_START&#39;, time };
+}
+
+function timerEnd() {
+    return { type: &#39;TIMER_END&#39; };
+}
+
+/** SAGAS **/
+
+import { delay } from &#39;redux-saga&#39;;
+import { put, takeEvery } from &#39;redux-saga/effects&#39;;
+
+function* timerSaga() {
+    yield takeEvery(&#39;TIMER_START&#39;, runTimer);
+}
+
+function* runTimer(action) {
+    yield delay(action.time * 1000);
+    yield put(timerEnd())
+}
+
+
+/** STORE **/
+sagaMiddleware.run(timerSaga);
+
+store.dispatch(timerStart(30));
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-29"><p>Let's rewrite the thunk timer example to sagas</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="1-8"><p>The action creators remained almost unchanged;
+the <code>runTimer</code> action creator was removed</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12-13"><p>Import utilities from the <code>redux-saga</code> lib</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15-17"><p>The <code>timerSaga</code> watches for <code>TIMER_START</code> actions using the <code>takeEvery</code> effect.
+When such action is dispached it will call the <code>runTimer</code> saga with the action.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="19-22"><p>The <code>runTimer</code> saga is tasked with handling individual actions</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="19"><p>It receives the <code>action</code> object as an argument</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="20"><p>The <code>delay</code> effect returns a promise that will be resolved after N miliseconds.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="20"><p><code>yield</code>ing the promise to saga's middleware will cause the execution of <code>runTimer</code> to pause until the promise is resolved.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>After the scheduled delay, <code>runTimer</code> will <code>put</code> the <code>TIMER_END</code> action.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>Using <code>put</code> will dispatch the action that was passed in</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="25-26"><p>Use the saga middleware to run the <code>timerSaga</code>.</p>
 </div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Performance<small class="dm-slide__title__subtitle">Optimizing React and Redux for best performance</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Measuring the performance</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">store.js</strong><code class="dm-code__editor hljs javascript">// npm install --save-dev react-addons-perf
 if (process.env.NODE_ENV !== &#39;production&#39;) {
     window.Perf = require(&#39;react-addons-perf&#39;);
@@ -929,4 +987,4 @@ npm run storybook
 </div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Add a story with name and a function that returns the component with certain params</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p>Add more stories with different params</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="10-11"><p>Remember to import component stories into the main stories file</p>
-</div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_d871d0962e16ac0f2558.js"></script><script type="text/javascript" src="bundle_d871d0962e16ac0f2558.js"></script></body></html>
+</div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_0ab414d5ac458cbe7a80.js"></script><script type="text/javascript" src="bundle_0ab414d5ac458cbe7a80.js"></script></body></html>
