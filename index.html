@@ -481,24 +481,31 @@ When such action is dispached it will call the <code>runTimer</code> saga with t
 </div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>After the scheduled delay, <code>runTimer</code> will <code>put</code> the <code>TIMER_END</code> action.</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>Using <code>put</code> will dispatch the action that was passed in</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="25-26"><p>Use the saga middleware to run the <code>timerSaga</code>.</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Running multiple sagas</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">// npm install --save redux-saga
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Running multiple sagas</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** SAGAS/INDEX.JS **/
+import { all } from `redux-saga/effects`;
 
-import { createStore, applyMiddleware } from &#39;redux&#39;
+import {sagaA} from &#39;./sagaA&#39;;
+import {sagaB} from &#39;./sagaB&#39;;
+/* ... */
 
-import createSagaMiddleware from &#39;redux-saga&#39;;
-const sagaMiddleware = createSagaMiddleware();
+export function* rootSaga() {
+    yield all([
+        sagaA(),
+        sagaB(),
+        /* ... */
+    ])
+}
 
+/** STORE.JS **/
+import {rootSaga} from &quot;./sagas&quot;
+
+const sagaMiddleware = createSagaMiddleware()
 const store = createStore(
     /* reducer, */
     applyMiddleware(sagaMiddleware)
 );
 
-function* greeterSaga() {
-    console.log(&#39;Greetings!&#39;)
-}
-
-sagaMiddleware.run(greeterSaga);
-
+sagaMiddleware.run(rootSaga);
 </code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="23"><p>The <code>.run</code> method on saga middleware can only run a single saga</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="4-6"><p>Import all required sagas</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="8-14"><p>Create a top-level saga</p>
@@ -1010,4 +1017,4 @@ npm run storybook
 </div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Add a story with name and a function that returns the component with certain params</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p>Add more stories with different params</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="10-11"><p>Remember to import component stories into the main stories file</p>
-</div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_9995c7fc64a5ad8d9c65.js"></script><script type="text/javascript" src="bundle_9995c7fc64a5ad8d9c65.js"></script></body></html>
+</div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_9935997b287a0cfa2017.js"></script><script type="text/javascript" src="bundle_9935997b287a0cfa2017.js"></script></body></html>
