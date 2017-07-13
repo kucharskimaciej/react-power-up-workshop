@@ -1,0 +1,31 @@
+extends ~layouts/columns
+
+block title
+    | Shallow rendering
+
+block content
+    +slide_column(60)
+        +code('MyComponent.test.js', 'javascript')
+            include:escape ./shallow-render.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-12').current-only
+            :markdown-it
+                `Enzyme` lib, especially the `shallow` renderer are used for proper unit-testing React components
+
+        +code_focus('2').current-only
+            :markdown-it
+                Instead of the standard `ReactDOM`, the rendering will be handled by `shallow` renderer from `enzyme`
+
+        +code_focus('8').current-only
+            :markdown-it
+                Use it to render `<MyComponent />`
+
+        +code_focus('8').current-only
+            :markdown-it
+                The component will not try to render any of other React components that are children to `<MyComponent/>`.
+                They will be treat as normal HTML elements instead.
+
+        +code_focus('9').current-only
+            :markdown-it
+                `wrapper` is a smart wrapper over a React node, that exposes various API to query and interact with the subtree

@@ -1,0 +1,39 @@
+extends ~layouts/columns
+
+block title
+    | Basics of immutable structures
+
+block content
+    +slide_column(60)
+        +code(null, 'javascript')
+            include:escape ./basics.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('3-5').current-only
+            :markdown-it
+                Mutable collection (aka regular array) can be changed with methods or overiding the data
+
+        +code_focus('7-9').current-only
+            :markdown-it
+                Immutable collections are called `List`s.
+                Pushing to a `List` will return a new instance.
+                Original `List` will be unchanged.
+
+        +code_focus('11-14').current-only
+            :markdown-it
+                Same principle applies to objects.
+                Plain JS objects can be easily modified.
+
+        +code_focus('16-19').current-only
+            :markdown-it
+                Immutable objects are called `Map`s.
+                They are less straight-forward to access (`.get`), but will return a new object after `set`.
+
+        +code_focus('21').current-only
+            :markdown-it
+                Converting deeply nesting structures to Immutable is easy with `fromJS` utility
+
+        +code_focus('22').current-only
+            :markdown-it
+                Each of Immutablejs structures has a `toJS` method that allows to convert the structure back to plan JS.
+

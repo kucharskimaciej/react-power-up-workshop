@@ -1,0 +1,38 @@
+extends ~layouts/columns
+
+block title
+    | Smoke tests - just checking
+
+block content
+    +slide_column(50)
+        +code('MyComponent.test.js', 'javascript')
+            include:escape ./smoke-test.js
+
+    +slide_column(50).l-column-middle
+        +code_focus('1-11').current-only
+            :markdown-it
+                By far the simplest test of React component test is a *smoke test*:
+                 just seeing if there are no errors when using the component.
+                 It's **often** enough for functional/presentational components that have no logic
+
+        +code_focus('1-2').current-only
+            :markdown-it
+                Import required React packages
+
+        +code_focus('3').current-only
+            :markdown-it
+                Import the component
+
+        +code_focus('6-9').current-only
+            :markdown-it
+                Try to render the component into a div
+
+        +code_focus('6-9').current-only
+            :markdown-it
+                This test has no `expect` statements. It will pass unless an error is thrown.
+
+        +code_focus('8').current-only
+            :markdown-it
+                Note: this is not exactly unit testing: if there are no errors,
+                then entire component subtree will be rendered.
+

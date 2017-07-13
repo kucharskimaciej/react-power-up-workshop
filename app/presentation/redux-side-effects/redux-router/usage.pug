@@ -1,0 +1,32 @@
+extends ~layouts/columns
+
+block title
+    | Use the Redux router
+
+block content
+    +slide_column(60)
+        +code(null, 'javascript')
+            include:escape ./usage.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-5').current-only
+            :markdown-it
+                Standard imports for the router component
+
+        +code_focus('6').current-only
+            :markdown-it
+                Instead of `Router` or `BrowserRouter` import the `ConnectedRouter`
+
+        +code_focus('11-18').current-only
+            :markdown-it
+                Standard Redux setup
+
+        +code_focus('12-17').current-only
+            :markdown-it
+                The `<ConnectedRouter />` component should be a child of the `<Provider />`
+                 so that it knows to use the application's `store`
+
+        +code_focus('14-15').current-only
+            :markdown-it
+                Setting up `<Route />`'s is the same as before
+

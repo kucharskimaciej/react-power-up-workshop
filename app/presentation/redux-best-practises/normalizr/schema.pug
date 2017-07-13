@@ -1,0 +1,44 @@
+extends ~layouts/columns
+
+block title
+    | Normalization schema
+
+block content
+    +slide_column(60)
+        +code('playlistsNormalizer.js', 'javascript')
+            include:escape ./schema.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1').current-only
+            :markdown-it
+                Install `normalizr`
+
+        +code_focus('4-12').current-only
+            :markdown-it
+                A `playlist` contains a `user` and `song`s with `authors`. In normalizr those are called *entities*.
+
+        +code_focus('4-12').current-only
+            :markdown-it
+                All entities are instances of the `Entity` class.
+
+        +code_focus('4-5').current-only
+            :markdown-it
+                Entities with no relationships are the easiest to cover.
+
+        +code_focus('6-8').current-only
+            :markdown-it
+                Each `song` contains an `author`.
+
+        +code_focus('9-12').current-only
+            :markdown-it
+                Each `playlist` has a `user` and a **list** of `songs`
+
+        +code_focus('14').current-only
+            :markdown-it
+                Final schema is a list of `playlists`.
+
+        +code_focus('16-18').current-only
+            :markdown-it
+                The `normalize` function takes some denormalized
+                `data` and normalizes it using the provided `schema`.
+

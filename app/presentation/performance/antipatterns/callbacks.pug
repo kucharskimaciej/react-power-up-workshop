@@ -1,0 +1,41 @@
+extends ~layouts/columns
+
+block title
+    | Binding context in callbacks
+
+block content
+    +slide_column(70)
+        +code(null, 'javascript')
+            include:escape ./callbacks.js
+
+    +slide_column(30).l-column-middle
+        +code_focus('1-13').current-only
+            :markdown-it
+                `ComponentA` wants to pass a callback to its children.
+
+        +code_focus('2-4').current-only
+            :markdown-it
+                The callback uses `this` to reference the current `ComponentA` instance.
+
+        +code_focus('8').current-only
+            :markdown-it
+                Common solution: bind the function context in the component's render.
+
+        +code_focus('8-10').current-only
+            :markdown-it
+                Antipattern: the children component tree (or DOM) needs to be rerendered,
+                because `.bind` returns a new function every time.
+
+        +code_focus('15-27').current-only
+            :markdown-it
+                `ComponentB` attempts to solve the same issue
+
+        +code_focus('22').current-only
+            :markdown-it
+                Instead of using `.bind` it uses an arrow function to keep the context.
+
+        +code_focus('22-24').current-only
+            :markdown-it
+                Same issue as before: new function created with every render
+
+

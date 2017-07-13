@@ -1,0 +1,42 @@
+extends ~layouts/columns
+
+block title
+    | Fixing callbacks
+
+block content
+    +slide_column(70)
+        +code(null, 'javascript')
+            include:escape ./fixing-callbacks.js
+
+    +slide_column(30).l-column-middle
+        +code_focus('1-13').current-only
+            :markdown-it
+                `ComponentA` was rewritten to avoid the anti-pattern.
+
+        +code_focus('4').current-only
+            :markdown-it
+                The callback is bound to the component's instance in the constructor.
+
+        +code_focus('9').current-only
+            :markdown-it
+                `this.handleUserAction` references the same function every time the `ComponentA` renders.
+
+        +code_focus('9-11').current-only
+            :markdown-it
+                React will have no trouble to recognize that there was no change; no rerendering of children will happen
+
+        +code_focus('16-28').current-only
+            :markdown-it
+                `ComponentB` solves the issue in more modern way
+
+        +code_focus('17-19').current-only
+            :markdown-it
+                Instead of using `.bind` in constructor define the method as an arrow function.
+
+        +code_focus('17-19').current-only
+            :markdown-it
+                **Important!** Class properties **will not work** in pure ES2015+ right now.
+                It's a `stage-2` proposal to the language.
+                Enabled by default in `create-react-app`.
+
+

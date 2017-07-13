@@ -1,0 +1,31 @@
+extends ~layouts/columns
+
+block title
+    | Installing flow
+
+block content
+    +slide_column(40)
+        +code('console', 'javascript')
+            include:escape ./installation.js
+
+    +slide_column(60).l-column-middle
+        +code_focus('1-2').current-only
+            :markdown-it
+                Install the `flow-bin` package with `npm` or `yarn`
+
+        +code_focus('12').current-only
+            :markdown-it
+                Add the `flow` script to the `scripts` section of `package.json`. Not necessary if installing via `yarn`.
+
+        +code_focus('16-17').current-only
+            :markdown-it
+                Run the initialization script with `flow init`.
+
+        +code_focus('19').current-only
+            :markdown-it
+                Start the app normally, the `create-react-app` will check the types automatically.
+
+        +code_focus('21').current-only
+            :markdown-it
+                Running the `flow` script will also check types
+

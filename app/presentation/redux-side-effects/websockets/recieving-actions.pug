@@ -1,0 +1,24 @@
+extends ~layouts/columns
+
+block title
+    | Receiving actions from the server
+
+block content
+    +slide_column(50)
+        +code(null, 'javascript')
+            include:escape ./recieving-actions.js
+
+    +slide_column(50).l-column-middle
+        +code_focus('1-5').current-only
+            :markdown-it
+                Server will emit `action` events, which data is the action to dispatch to store
+
+        +code_focus('8').current-only
+            :markdown-it
+                On the client-side, subscribing to events is handled by the socket.io middleware
+
+        +code_focus('10-18').current-only
+            :markdown-it
+                Since an action is just a plain object, there is no difference between handling action dispached on client or server.
+
+

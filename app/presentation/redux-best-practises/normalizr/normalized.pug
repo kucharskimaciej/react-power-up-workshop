@@ -1,0 +1,36 @@
+extends ~layouts/columns
+
+block title
+    | Normalized state
+
+block content
+    +slide_column(40)
+        +code(null, 'json')
+            include:escape ./normalized.json
+
+    +slide_column(60).l-column-middle
+        +code_focus('1-47').current-only
+            :markdown-it
+                The following object is a result using `normalizr` on the list of playlists
+
+        +code_focus('5-9').current-only
+            :markdown-it
+                A `playlist` now doesn't hold any data belonding to another entity - just the ids.
+
+        +code_focus('16-37').current-only
+            :markdown-it
+                Each `song` is represented exactly once.
+
+        +code_focus('38-45').current-only
+            :markdown-it
+                Same goes for `user`s and `author`s
+
+        +code_focus('4-15').current-only
+            :markdown-it
+                Entities are records in a dictionary which keys are the entity ids.
+
+        +code_focus('3').current-only
+            :markdown-it
+                Since playlists changed from an array to an object the ordering was lost.
+                The `result` field holds the original order of elements.
+

@@ -1,0 +1,39 @@
+[
+    {
+      "id": 0,
+      "user": { "id": 0, "name": "Maciej" },
+      "songs": [
+        {
+          "id": 1,
+          "title": "Far Behind",
+          "author": { "id": 200, "name": "Oleska" }
+        },
+        {
+          "id": 2,
+          "title": "Celebration",
+          "author": { "id": 200, "name": "Oleska" }
+        },
+        {
+          "id": 3,
+          "title": "Back to Back",
+          "author": { "id": 205, "name": "Drake" }
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "user": { "id": 1, "name": "Wojtek" },
+      "songs": [
+        {
+          "id": 1,
+          "title": "Far Behind",
+          "author": { "id": 200, "name": "Oleska" }
+        },
+        {
+          "id": 4,
+          "title": "Tuesday",
+          "author": { "id": 205, "name": "Drake" }
+        }
+      ]
+    }
+  ]

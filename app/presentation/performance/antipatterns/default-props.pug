@@ -1,0 +1,36 @@
+extends ~layouts/columns
+
+block title
+    | Providing defaults
+
+block content
+    +slide_column(70)
+        +code(null, 'javascript')
+            include:escape ./default-props.js
+
+    +slide_column(30).l-column-middle
+        +code_focus('6').current-only
+            :markdown-it
+                `BadComponent` provides some options to it's child component.
+
+        +code_focus('3').current-only
+            :markdown-it
+                In case it didn't recieve the options as props, the empty object is provided as default.
+
+        +code_focus('5-7').current-only
+            :markdown-it
+                Anitpattern: Much like with callbacks, `AnotherComponent` will be rendered every time.
+
+        +code_focus('11-21').current-only
+            :markdown-it
+                Solution: the default options must be shared between rerenders
+
+        +code_focus('12').current-only
+            :markdown-it
+                `GoodComponent` uses a class property to make sure that `defaultOptions` is the same object everytime.
+
+        +code_focus('24-26').current-only
+            :markdown-it
+                `AlsoGoodComponent` uses the React's `defaultProps` feature.
+
+

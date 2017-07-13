@@ -1,0 +1,45 @@
+extends ~layouts/columns
+
+block title
+    | Using normalizr with redux
+
+block content
+    +slide_column(60)
+        +code(null, 'javascript')
+            include:escape ./using.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-14').current-only
+            :markdown-it
+                To keep the state normalized all updates should normalize the data first
+
+        +code_focus('3').current-only
+            :markdown-it
+                The `normalizePlaylists` is a function exported from the schema definition file (one of previous slides)
+
+        +code_focus('8').current-only
+            :markdown-it
+                `action.payload` is the denormalized API response
+
+        +code_focus('9').current-only
+            :markdown-it
+                Update the application state with fully normalized entities
+
+        +code_focus('22-32').current-only
+            :markdown-it
+                The normalized state, while easy to manage,
+                is not useful to components and requries some transformation
+
+        +code_focus('23').current-only
+            :markdown-it
+                Get currently viewed playlist. The data is normalized and it's denormalization quite complicated - there are multiple levels of nesting.
+
+        +code_focus('24-28').current-only
+            :markdown-it
+                Use the `denormalize` utility from `normalizr`,
+                passing in normalized data, the normalization schema,
+                and all relevant entities.
+
+        +code_focus('26').current-only
+            :markdown-it
+                The `playlistSchema` is defined on earlier slide.

@@ -1,0 +1,60 @@
+extends ~layouts/columns
+
+block title
+    | Types in flow
+
+block content
+    +slide_column(40)
+        +code('console', 'javascript')
+            include:escape ./types.js
+
+    +slide_column(60).l-column-middle
+        +code_focus('1').current-only
+            :markdown-it
+                Mark the file as flow-typed with the `@flow` directive
+
+        +code_focus('3').current-only
+            :markdown-it
+                Declare variable types with the `variableName: type` syntax
+
+        +code_focus('5').current-only
+            :markdown-it
+                Function's arguments can be typed too
+
+        +code_focus('5').current-only
+            :markdown-it
+                Optional arguments are marked with the `?` character prefixing the type
+
+        +code_focus('5').current-only
+            :markdown-it
+                Function's return type is defined after the argument list
+
+        +code_focus('12').current-only
+            :markdown-it
+                Array types are defined using the `Type[]` syntax
+
+        +code_focus('13-21').current-only
+            :markdown-it
+                Custom types can be defined using `interfaces`.
+                Interfaces exists only for typing purposes and do not appear in compiled code.
+
+        +code_focus('15-18').current-only
+            :markdown-it
+                Complex types can also be defined inline.
+
+        +code_focus('21').current-only
+            :markdown-it
+                Interfaces can define typing for methods as well.
+
+        +code_focus('24-29').current-only
+            :markdown-it
+                Interface can be used in the same way as any other type
+
+        +code_focus('31-33').current-only
+            :markdown-it
+                Another way to define a type is to use a `class`
+
+        +code_focus('35').current-only
+            :markdown-it
+                All instances of class `Foo` are of type `Foo`.
+

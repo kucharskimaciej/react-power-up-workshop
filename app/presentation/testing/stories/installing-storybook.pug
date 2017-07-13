@@ -1,0 +1,28 @@
+extends ~layouts/columns
+
+block title
+    | Setup the storybook
+
+block content
+    +slide_column(60)
+        +code(null, 'javascript')
+            include:escape ./installation.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-2').current-only
+            :markdown-it
+                Install the `storybook` command line tool
+
+        +code_focus('4-5').current-only
+            :markdown-it
+                In the main project directory run the `getstorybook` command,
+                which will setup the storybook for current application
+
+        +code_focus('6').current-only
+            :markdown-it
+                Start the storybook app. Go to `http://localhost:9009/` to see the example storybook.
+
+        +code_focus('1-8').current-only
+            :markdown-it
+                The storybook loads stories defined in `src/stories/index.js` or `src/stories.js` files.
+                Delete to file contents to remove the default stories.

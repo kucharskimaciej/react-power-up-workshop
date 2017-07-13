@@ -1,0 +1,31 @@
+extends ~layouts/columns
+
+block title
+    | Regular action creators
+
+block content
+    +slide_column(60)
+        +code('MyComponent.test.js', 'javascript')
+            include:escape ./action-creator-test.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-25').current-only
+            :markdown-it
+                Synchronous action creators are usually very simple functions, so testing is staright-forward
+
+        +code_focus('1-10').current-only
+            :markdown-it
+                An action creator straight from the world's most popular React application
+
+        +code_focus('15-18').current-only
+            :markdown-it
+                Check for correct type
+
+        +code_focus('20-23').current-only
+            :markdown-it
+                Check for correct payload
+
+        +code_focus('13-24').current-only
+            :markdown-it
+                Such simple action creators are commonly tested indirectly when testing reducers
+                and have no tests on their own

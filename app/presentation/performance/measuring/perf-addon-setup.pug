@@ -1,0 +1,54 @@
+extends ~layouts/columns
+
+block title
+    | Measuring the performance
+
+block content
+    +slide_column(40)
+        +code('store.js', 'javascript')
+            include:escape ./setup.js
+
+    +slide_column(60).l-column-middle
+        +code_focus('1').current-only
+            :markdown-it
+                Install the `react-addons-perf` package
+
+        +code_focus('2-4').current-only
+            :markdown-it
+                Import and assign to the `window` object to make it available
+                via console in the browser
+
+        +code_focus('6').current-only
+            :markdown-it
+                Proceed with normal React setup
+
+        +code_focus('9').current-only
+            :markdown-it
+                All following commands will be issued in the browser's console
+
+        +code_focus('10').current-only
+            :markdown-it
+                Start measuring performance
+
+        +code_focus('11').current-only
+            :markdown-it
+                Use the app
+
+        +code_focus('12').current-only
+            :markdown-it
+                Stop the measurement
+
+        +code_focus('13').current-only
+            :markdown-it
+                Get the total render count/time for every component.
+                Useful to get an overview on which components are slow.
+
+        +code_focus('14').current-only
+            :markdown-it
+                More detailed view of the same measurements.
+                Doesn't include the time of mounting components.
+
+        +code_focus('15').current-only
+            :markdown-it
+                Shows renders that happened (the `render` function was called)
+                but resulted in no changes in DOM.

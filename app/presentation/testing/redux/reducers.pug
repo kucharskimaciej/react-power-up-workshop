@@ -1,0 +1,31 @@
+extends ~layouts/columns
+
+block title
+    | Reducers
+
+block content
+    +slide_column(60)
+        +code('MyComponent.test.js', 'javascript')
+            include:escape ./reducers.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-16').current-only
+            :markdown-it
+                Reducers are **pure functions**, which makes them very easy to test
+
+        +code_focus('1').current-only
+            :markdown-it
+                Import the reducer
+
+        +code_focus('5').current-only
+            :markdown-it
+                The reducer takes current `state` and an `action` and returns new `state`.
+                Normally this bit would be called by Redux.
+
+        +code_focus('6-11').current-only
+            :markdown-it
+                Define the expected shape of new `state`.
+
+        +code_focus('13').current-only
+            :markdown-it
+                Perform deep equality check with `toEqual` matcher.

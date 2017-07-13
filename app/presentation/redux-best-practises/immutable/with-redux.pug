@@ -1,0 +1,28 @@
+extends ~layouts/columns
+
+block title
+    | Using immutable data with redux
+
+block content
+    +slide_column(60)
+        +code(null, 'javascript')
+            include:escape ./with-redux.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('3').current-only
+            :markdown-it
+                Define the `defaultState` for this reducer as an immutable `object`
+
+        +code_focus('8').current-only
+            :markdown-it
+                General state updates can be handled with `merge` or `mergeDeep` utilities
+
+        +code_focus('11-12').current-only
+            :markdown-it
+                Actions that create more specific updates need custom logic.
+
+        +code_focus('12').current-only
+            :markdown-it
+                **Never** `set` or `push` mutable object to otherwise immutable structure.
+                Regular objects need to be converted to immutable with proper constructor function.
+                When in doubt use `fromJS`. `merge` and `mergeDeep` are safe too.

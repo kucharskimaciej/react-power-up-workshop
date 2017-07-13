@@ -1,0 +1,32 @@
+extends ~layouts/columns
+
+block title
+    | Avoiding children rerenders
+
+block content
+    +slide_column(70)
+        +code(null, 'javascript')
+            include:escape ./children.js
+
+    +slide_column(30).l-column-middle
+        +code_focus('1-11').current-only
+            :markdown-it
+                `BadComponent` renders a well-optimized `FastComponent` and provides it's child: the `ChildComponent`.
+
+        +code_focus('6-8').current-only
+            :markdown-it
+                JSX is just syntax-sugar over `React.createElement` which returns the node.
+                Calling the function returns a new object every time.
+
+        +code_focus('7').current-only
+            :markdown-it
+                Nested elements are passed as `children` prop to the component.
+
+        +code_focus('6-8').current-only
+            :markdown-it
+                Antipattern: `FastComponent` will rerender, because one of it's props (`children`) is different with every `BadComponent` render.
+
+        +code_focus('14-24').current-only
+            :markdown-it
+                Solution: cache the `ChildComponent` in a class property.
+

@@ -1,0 +1,30 @@
+extends ~layouts/columns
+
+block title
+    | Dispatching actions to the server
+
+block content
+    +slide_column(50)
+        +code(null, 'javascript')
+            include:escape ./dispatching.js
+
+    +slide_column(50).l-column-middle
+        +code_focus('2-7').current-only
+            :markdown-it
+                Action that will be dispatched to the server via websockets is just a regular action.
+
+        +code_focus('4').current-only
+            :markdown-it
+                The only difference: the action type starts with `SERVER/`, which matches the middleware configuration
+
+        +code_focus('9').current-only
+            :markdown-it
+                Dispatch the action as usual
+
+        +code_focus('12-21').current-only
+            :markdown-it
+                The server will receive `action` event, with the action as payload
+
+        +code_focus('14-15').current-only
+            :markdown-it
+                The action will be handled depending on its type

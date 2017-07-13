@@ -1,0 +1,51 @@
+extends ~layouts/columns
+
+block title
+    | Snapshots
+
+block content
+    +slide_column(60)
+        +code('MyComponent.test.js', 'javascript')
+            include:escape ./snapshots.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-38').current-only
+            :markdown-it
+                Snapshots are used to prevent accidental changes of UI
+
+        +code_focus('2').current-only
+            :markdown-it
+                Import `renderer` that will render the component instead of the usual `ReactDOM`
+
+        +code_focus('7-11').current-only
+            :markdown-it
+                Use it to render `<MyComponent />`
+
+        +code_focus('7-11').current-only
+            :markdown-it
+                The `renderer.create` method returns a JS object representing the rendered component
+
+        +code_focus('13').current-only
+            :markdown-it
+                Use the `toMatchSnapshot` to check if generated tree matches the previously saved snapshot
+
+        +code_focus('6-14').current-only
+            :markdown-it
+                This test will pass the first time it's run, because there is no snapshot to match against.
+                At the same time the snapshot will be created.
+
+        +code_focus('17-22').current-only
+            :markdown-it
+                The snapshot is JSX-like representation of the rendered subtree.
+
+        +code_focus('17-22').current-only
+            :markdown-it
+                Snapshots are saved to a file with `.snap` extension that should be checked into the VCS
+
+        +code_focus('25-34').current-only
+            :markdown-it
+                If the test or the component are modified, matching against the snapshot will fail
+
+        +code_focus('36-37').current-only
+            :markdown-it
+                Replace old snapshots with new version

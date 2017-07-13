@@ -1,0 +1,34 @@
+extends ~layouts/columns
+
+block title
+    | Denormalized state
+
+block content
+    +slide_column(40)
+        +code(null, 'json')
+            include:escape ./denormalized.json
+
+    +slide_column(60).l-column-middle
+        +code_focus('2-22').current-only
+            :markdown-it
+                The following JSON is a result of calling `GET /playlists`
+
+        +code_focus('23-38').current-only
+            :markdown-it
+                The API returns an array of `playlists`,
+                each containing array of `song`s with `author`s
+                and the `user` the `playlist` belongs to.
+
+        +code_focus('23-38').current-only
+            :markdown-it
+                This is a standard way of dealing with relations in data
+                and appears very often (ie. `posts`-`comments`-`authors`)
+
+        +code_focus('5-21').current-only
+            :markdown-it
+                Problem #1: duplicated data - some songs and authors appear more than once
+
+        +code_focus('9').current-only
+            :markdown-it
+                Problem #2: very difficult to update nested data and remain consistent
+

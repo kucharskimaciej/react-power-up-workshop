@@ -1,0 +1,40 @@
+extends ~layouts/columns
+
+block title
+    | Setup react-router with Redux
+
+block content
+    +slide_column(60)
+        +code(null, 'javascript')
+            include:escape ./setup.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-3').current-only
+            :markdown-it
+                Install the required packages
+
+        +code_focus('2').current-only
+            :markdown-it
+                Remember to add the `@next` suffix -
+                the default version of `react-router-redux` works only with old `react-router` versions
+
+        +code_focus('7').current-only
+            :markdown-it
+                `history` is a library that allows easy management of session history via JS.
+                The `createBrowserHistory` method is using HTML5 History API and should be used with new browsers.
+
+        +code_focus('9').current-only
+            :markdown-it
+               Create and export a `history` instance for the application
+
+        +code_focus('10').current-only
+            :markdown-it
+                Setup routing middleware to use the `history `instance
+
+        +code_focus('12-18').current-only
+            :markdown-it
+                Standard store setup with multiple reducers and a middleware
+
+        +code_focus('15').current-only
+            :markdown-it
+                Routing state is in the `router` sub-tree of the application state

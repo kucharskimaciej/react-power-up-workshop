@@ -1,0 +1,50 @@
+extends ~layouts/columns
+
+block title
+    | Introducing Jest - the testing lib for React apps
+
+block content
+    +slide_column(50)
+        +code('./services/Service.test.js', 'javascript')
+            include:escape ./introduction.js
+
+    +slide_column(50).l-column-middle
+        +code_focus('1-26').current-only
+            :markdown-it
+                To properly work with the default `create-react-app` config,
+                all tests are in files which names end with `.test.js`.
+                For example, if `MyComponent` is in file `MyComponent.js`,
+                it's tests should be in file called `MyComponent.test.js`
+
+        +code_focus('9-25').current-only
+            :markdown-it
+                Tests are grouped in `describe` blocks.
+
+        +code_focus('9').current-only
+            :markdown-it
+                The top level `describe` is actually optional:
+                properly naming the file should be enough,
+                provided there is only one class/service/component per file
+
+
+        +code_focus('12-14').current-only
+            :markdown-it
+                Code in `beforeEach` block will be run before each test.
+                This block should be used for initialization of fixtures/common setup.
+                There should be no shared state between tests.
+
+        +code_focus('16-18').current-only
+            :markdown-it
+                A test is a function (`it` or `test`) that takes 2 arguments:
+                the test `description` and a function that will contain expectations
+
+        +code_focus('17').current-only
+            :markdown-it
+                The `expect` function is used for testing values.
+                It is followed by a matcher -- a function that asserts something about the value.
+                In this case it's `toBe` which checks equality
+
+        +code_focus('20-24').current-only
+            :markdown-it
+                `describe` blocks can be nested, along with their own `beforeEach`/`afterEach` functions.
+                Nested `describes` are using for grouping tests.

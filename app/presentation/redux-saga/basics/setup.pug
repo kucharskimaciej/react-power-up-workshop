@@ -1,0 +1,33 @@
+extends ~layouts/columns
+
+block title
+    | Setting up the store
+
+block content
+    +slide_column(50)
+        +code(null, 'javascript')
+            include:escape ./setup.js
+
+    +slide_column(50).l-column-middle
+        +code_focus('1-3').current-only
+            :markdown-it
+                Install required packages
+
+        +code_focus('10').current-only
+            :markdown-it
+                Create a socket connection using the `socket.io` library
+
+        +code_focus('11').current-only
+            :markdown-it
+                Create the middleware for handling sockets. It takes the socket as first argument.
+
+        +code_focus('11').current-only
+            :markdown-it
+                The second argument is the *socket action prefix*:
+                in this example, all actions prefixed with `SERVER/` (`SERVER/ADD_TODO`, etc) will emit a message through the socket
+
+        +code_focus('13-16').current-only
+            :markdown-it
+                Standard store setup
+
+

@@ -1,0 +1,28 @@
+extends ~layouts/columns
+
+block title
+    | Why did you update?
+
+block content
+    +slide_column(50)
+        +code('index.js', 'javascript')
+            include:escape ./setup.js
+
+    +slide_column(50).l-column-middle
+
+        +code_focus('1').current-only
+            :markdown-it
+                Install the `why-did-you-update` package
+
+        +code_focus('5').current-only
+            :markdown-it
+                Import the setup function
+
+        +code_focus('6').current-only
+            :markdown-it
+                Start reporting unnecessary rerenders
+
+        +code_focus('1-9').current-only
+            .l-column-fit
+                img(src=require('presentation/performance/component-updates/why-did-you-update.png')).l-island
+                | Enjoy!

@@ -1,0 +1,34 @@
+extends ~layouts/columns
+
+block title
+    | Creating a story
+
+block content
+    +slide_column(60)
+        +code('MyComponent.stories.js', 'javascript')
+            include:escape ./installation.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-8').current-only
+            :markdown-it
+                By convention, the stories for given component are defined in the same directory in file called `COMPONENT_NAME.stories.js`.
+
+        +code_focus('1-3').current-only
+            :markdown-it
+                Required imports
+
+        +code_focus('5').current-only
+            :markdown-it
+                Create a group of stories; should be called the same as the component under test
+
+        +code_focus('6').current-only
+            :markdown-it
+                Add a story with name and a function that returns the component with certain params
+
+        +code_focus('7').current-only
+            :markdown-it
+                Add more stories with different params
+
+        +code_focus('10-11').current-only
+            :markdown-it
+                Remember to import component stories into the main stories file
