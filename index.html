@@ -1,0 +1,932 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link href="bundle_020bed8ceba449b8a8ca38fbb9e1d22b.css" rel="stylesheet"></head><body><div class="reveal"><div class="slides"><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Power-up React</h1></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux side-effects<small class="dm-slide__title__subtitle">Going for the best experience</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">What is a thunk?</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">function answer() {
+    return 42;
+}
+
+function greeting(name) {
+    return () =&gt; `Hello, ${name}!`;
+}
+
+function fetchData(params, transformFn) {
+    return function() {
+        API.fetch(params)
+            .then(result =&gt; transformFn(result));
+    }
+}
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>A thunk is just a function that will return some data or perform an operation when called.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>The function takes no arguments - it has access to all data it needs.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5-7"><p>Most often the thunk will have access to some params via closure.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9-14"><p>The thunk can do anything - synchoronous or not</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Thunks in Redux - setup and basic usage</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">import { createStore, applyMiddleware } from &#39;redux&#39;;
+import thunk from &#39;redux-thunk&#39;;
+
+const store = createStore(
+    /* reducers, */
+    applyMiddleware(thunk)
+);
+
+function greet(name) {
+    return { type: &#39;GREET&#39;, name }
+}
+
+function hello(name) {
+    return function (dispatch) {
+        dispatch(greet(&#39;Maciej&#39;));
+    };
+}
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Import standard methods from <code>redux</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="2"><p>The <code>redux-thunk</code> library provides a middleware</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4-7"><p>Create a store providing reducers (out of slide) and applying thunk middleware</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9-11"><p>Very simple action creator</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9-11"><p><code>hello</code> is a function that will return a thunk - it's here for the purpose of creating a closure over <code>name</code> argument</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14-16"><p>Thanks to the <code>thunk</code> middleware, the thunk will actually get the store's <code>dispatch</code> function as first argument.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15"><p>Use the <code>dispatch</code> to dispatch <code>greet</code> action.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Multiple and asynchronous actions</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/* imports, setup, middleware */
+
+function timerStart(timerId) {
+    return { type: &#39;TIMER_START&#39;, timerId };
+}
+
+function timerEnd() {
+    return { type: &#39;TIMER_END&#39; };
+}
+
+function runTimer(delay) {
+    return function(dispatch) {
+        const timerId = setTimeout(() =&gt; {
+            dispatch(timerEnd());
+        }, delay * 1000);
+
+        dispatch(timerStart(timerId));
+    };
+}
+
+store.dispatch(runTimer(5));
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Imports and setup of store and middleware - just as before</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="3-9"><p>Define regular, synchronous action creators</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11-19"><p>Create a thunk that takes in one argument</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="17"><p>At first it will dispatch the <code>TIMER_START</code> action</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13-15"><p>After the delay, dispatch <code>TIMER_END</code> action</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>Still dispatches like a regular action</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setup react-router with Redux</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/* INSTALLATION */
+// npm install --save react-router-redux@next
+// npm install --save history
+
+import { createStore, combineReducers, applyMiddleware } from &#39;redux&#39;;
+import { routerReducer, routerMiddleware } from &#39;react-router-redux&#39;;
+import createBrowserHistory from &#39;history/createBrowserHistory&#39;;
+
+export const history = createBrowserHistory();
+const middleware = routerMiddleware(history);
+
+export const store = createStore(
+    combineReducers({
+        /* ...reducers, */
+        router: routerReducer
+    }),
+    applyMiddleware(middleware)
+)
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>Install the required packages</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="2"><p>Remember to add the <code>@next</code> suffix -
+the default version of <code>react-router-redux</code> works only with old <code>react-router</code> versions</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p><code>history</code> is a library that allows easy management of session history via JS.
+The <code>createBrowserHistory</code> method is using HTML5 History API and should be used with new browsers.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>Create and export a <code>history</code> instance for the application</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="10"><p>Setup routing middleware to use the <code>history</code>instance</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12-18"><p>Standard store setup with multiple reducers and a middleware</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15"><p>Routing state is in the <code>router</code> sub-tree of the application state</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Use the Redux router</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">import React from &#39;react&#39;
+import ReactDOM from &#39;react-dom&#39;
+
+import { Provider } from &#39;react-redux&#39;;
+import { Route } from &#39;react-router&#39;;
+import { ConnectedRouter } from &#39;react-router-redux&#39;;
+
+import {history, store} from &quot;./store&quot;
+
+ReactDOM.render(
+    &lt;Provider store={store}&gt;
+        &lt;ConnectedRouter history={history}&gt;
+            &lt;div&gt;
+                &lt;Route exact path=&quot;/&quot; component={Home}/&gt;
+                &lt;Route path=&quot;/about&quot; component={About}/&gt;
+            &lt;/div&gt;
+        &lt;/ConnectedRouter&gt;
+    &lt;/Provider&gt;,
+    document.getElementById(&#39;root&#39;)
+)
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-5"><p>Standard imports for the router component</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Instead of <code>Router</code> or <code>BrowserRouter</code> import the <code>ConnectedRouter</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11-18"><p>Standard Redux setup</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12-17"><p>The <code>&lt;ConnectedRouter /&gt;</code> component should be a child of the <code>&lt;Provider /&gt;</code>
+so that it knows to use the application's <code>store</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14-15"><p>Setting up <code>&lt;Route /&gt;</code>'s is the same as before</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Working with websockets</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setting up the store</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** CONSOLE **/
+npm install --save socket.io
+npm install --save redux-socket.io
+
+/** STORE.JS **/
+import { createStore, applyMiddleware } from &#39;redux&#39;;
+
+import createSocketIoMiddleware from &#39;redux-socket.io&#39;;
+import io from &#39;socket.io-client&#39;;
+let socket = io(SOCKET_ADDRESS);
+let socketIoMiddleware = createSocketIoMiddleware(socket, &quot;SERVER/&quot;);
+
+const store = createStore(
+    /* reducers, */
+    applyMiddleware(socketIoMiddleware)
+);
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>Install required packages</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="10"><p>Create a socket connection using the <code>socket.io</code> library</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11"><p>Create the middleware for handling sockets. It takes the socket as first argument.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11"><p>The second argument is the <em>socket action prefix</em>:
+in this example, all actions prefixed with <code>SERVER/</code> (<code>SERVER/ADD_TODO</code>, etc) will emit a message through the socket</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13-16"><p>Standard store setup</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Receiving actions from the server</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** SERVER **/
+socket.emit(&#39;action&#39;, {
+    type: &#39;ADD_PRODUCT&#39;,
+    payload: { /* product */ }
+});
+
+
+/** CLIENT **/
+
+function productsReducer(state = [], action) {
+    switch (action.type) {
+        case &#39;ADD_PRODUCT&#39;:
+            return [...state, action.payload];
+
+        default:
+            return state;
+    }
+}
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-5"><p>Server will emit <code>action</code> events, which data is the action to dispatch to store</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8"><p>On the client-side, subscribing to events is handled by the socket.io middleware</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="10-18"><p>Since an action is just a plain object, there is no difference between handling action dispached on client or server.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Dispatching actions to the server</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** CLIENT **/
+function addProduct(product) {
+    return {
+        type: &#39;SERVER/ADD_PRODUCT&#39;,
+        payload: product
+    };
+}
+
+store.dispatch(addProduct({ /* product */ }));
+
+/** SERVER **/
+socket.on(&#39;action&#39;, (action) =&gt; {
+    switch (action.type) {
+        case &#39;SERVER/ADD_PRODUCT&#39;:
+            /* handle adding product */
+    }
+});
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="2-7"><p>Action that will be dispatched to the server via websockets is just a regular action.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4"><p>The only difference: the action type starts with <code>SERVER/</code>, which matches the middleware configuration</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>Dispatch the action as usual</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12-21"><p>The server will receive <code>action</code> event, with the action as payload</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14-15"><p>The action will be handled depending on its type</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux best practises<small class="dm-slide__title__subtitle">Tools for the best experience</small></h1></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Handling denormalized data</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Denormalized state</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs json">[
+    {
+      &quot;id&quot;: 0,
+      &quot;user&quot;: { &quot;id&quot;: 0, &quot;name&quot;: &quot;Maciej&quot; },
+      &quot;songs&quot;: [
+        {
+          &quot;id&quot;: 1,
+          &quot;title&quot;: &quot;Far Behind&quot;,
+          &quot;author&quot;: { &quot;id&quot;: 200, &quot;name&quot;: &quot;Oleska&quot; }
+        },
+        {
+          &quot;id&quot;: 2,
+          &quot;title&quot;: &quot;Celebration&quot;,
+          &quot;author&quot;: { &quot;id&quot;: 200, &quot;name&quot;: &quot;Oleska&quot; }
+        },
+        {
+          &quot;id&quot;: 3,
+          &quot;title&quot;: &quot;Back to Back&quot;,
+          &quot;author&quot;: { &quot;id&quot;: 205, &quot;name&quot;: &quot;Drake&quot; }
+        }
+      ]
+    },
+    {
+      &quot;id&quot;: 1,
+      &quot;user&quot;: { &quot;id&quot;: 1, &quot;name&quot;: &quot;Wojtek&quot; },
+      &quot;songs&quot;: [
+        {
+          &quot;id&quot;: 1,
+          &quot;title&quot;: &quot;Far Behind&quot;,
+          &quot;author&quot;: { &quot;id&quot;: 200, &quot;name&quot;: &quot;Oleska&quot; }
+        },
+        {
+          &quot;id&quot;: 4,
+          &quot;title&quot;: &quot;Tuesday&quot;,
+          &quot;author&quot;: { &quot;id&quot;: 205, &quot;name&quot;: &quot;Drake&quot; }
+        }
+      ]
+    }
+  ]
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:60%;flex-basis:60%;"><div class="current-only fragment dm-code-focus" data-code-focus="2-22"><p>The following JSON is a result of calling <code>GET /playlists</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="23-38"><p>The API returns an array of <code>playlists</code>,
+each containing array of <code>song</code>s with <code>author</code>s
+and the <code>user</code> the <code>playlist</code> belongs to.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="23-38"><p>This is a standard way of dealing with relations in data
+and appears very often (ie. <code>posts</code>-<code>comments</code>-<code>authors</code>)</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5-21"><p>Problem #1: duplicated data - some songs and authors appear more than once</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>Problem #2: very difficult to update nested data and remain consistent</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Normalization schema</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">playlistsNormalizer.js</strong><code class="dm-code__editor hljs javascript">// npm install --save normalizr
+const { normalize, schema } = require(&#39;normalizr&#39;);
+
+const userSchema = new schema.Entity(&#39;users&#39;);
+const authorSchema = new schema.Entity(&#39;authors&#39;);
+export const songSchema = new schema.Entity(&#39;songs&#39;, {
+    author: authorSchema
+});
+export const playlistSchema = new schema.Entity(&#39;playlists&#39;, {
+    user: userSchema,
+    songs: [songSchema]
+});
+
+export const playlistsSchema = [playlistSchema];
+
+export default function(data) {
+    return normalize(data, playlistsSchema);
+}
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Install <code>normalizr</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4-12"><p>A <code>playlist</code> contains a <code>user</code> and <code>song</code>s with <code>authors</code>. In normalizr those are called <em>entities</em>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4-12"><p>All entities are instances of the <code>Entity</code> class.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4-5"><p>Entities with no relationships are the easiest to cover.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6-8"><p>Each <code>song</code> contains an <code>author</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9-12"><p>Each <code>playlist</code> has a <code>user</code> and a <strong>list</strong> of <code>songs</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14"><p>Final schema is a list of <code>playlists</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="16-18"><p>The <code>normalize</code> function takes some denormalized
+<code>data</code> and normalizes it using the provided <code>schema</code>.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Normalized state</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs json">{
+  &quot;entities&quot;: {
+    &quot;result&quot;: [ 0, 1 ],
+    &quot;playlists&quot;: {
+      &quot;0&quot;: {
+        &quot;id&quot;: 0,
+        &quot;user&quot;: 0,
+        &quot;songs&quot;: [ 1, 2, 3 ]
+      },
+      &quot;1&quot;: {
+        &quot;id&quot;: 1,
+        &quot;user&quot;: 1,
+        &quot;songs&quot;: [ 1, 4 ]
+      }
+    },
+    &quot;songs&quot;: {
+      &quot;1&quot;: {
+        &quot;id&quot;: 1,
+        &quot;title&quot;: &quot;Far Behind&quot;,
+        &quot;author&quot;: 200
+      },
+      &quot;2&quot;: {
+        &quot;id&quot;: 2,
+        &quot;title&quot;: &quot;Celebration&quot;,
+        &quot;author&quot;: 200
+      },
+      &quot;3&quot;: {
+        &quot;id&quot;: 3,
+        &quot;title&quot;: &quot;Back to Back&quot;,
+        &quot;author&quot;: 205
+      },
+      &quot;4&quot;: {
+        &quot;id&quot;: 4,
+        &quot;title&quot;: &quot;Tuesday&quot;,
+        &quot;author&quot;: 205
+      }
+    },
+    &quot;users&quot;: {
+      &quot;0&quot;: { &quot;id&quot;: 0, &quot;name&quot;: &quot;Maciej&quot; },
+      &quot;1&quot;: { &quot;id&quot;: 1, &quot;name&quot;: &quot;Wojtek&quot; }
+    },
+    &quot;authors&quot;: {
+      &quot;200&quot;: { &quot;id&quot;: 200, &quot;name&quot;: &quot;Oleska&quot; },
+      &quot;205&quot;: { &quot;id&quot;: 205, &quot;name&quot;: &quot;Drake&quot; }
+    }
+  }
+}
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:60%;flex-basis:60%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-47"><p>The following object is a result using <code>normalizr</code> on the list of playlists</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5-9"><p>A <code>playlist</code> now doesn't hold any data belonding to another entity - just the ids.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="16-37"><p>Each <code>song</code> is represented exactly once.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="38-45"><p>Same goes for <code>user</code>s and <code>author</code>s</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4-15"><p>Entities are records in a dictionary which keys are the entity ids.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="3"><p>Since playlists changed from an array to an object the ordering was lost.
+The <code>result</code> field holds the original order of elements.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Using normalizr with redux</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/* REDUCER */
+
+import normalizePlaylists from &#39;./schema&#39;;
+
+function reducer(state = {}, action) {
+    switch (action.type) {
+        case &#39;DESERIALIZE_PLAYLISTS&#39;:
+            const normalized = normalizePlaylists(action.payload);
+            return Object.assign({}, state, normalized.entities);
+
+        default:
+            return state;
+    }
+}
+
+/* CONTAINER */
+
+import {denormalize} from &#39;normalizr&#39;;
+import {playlistSchema} from &#39;./schema&#39;
+
+
+function mapStateToProps(state) {
+    const normalizedPlaylist = state.playlists[state.currentPlaylistId];
+    const denormalizedPlaylist = denormalize(
+        normalizedPlaylist,
+        playlistSchema,
+        state
+    );
+    return {
+        currentPlaylist: denormalizedPlaylist
+    };
+}
+
+export default connect(mapStateToProps)(Container)
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-14"><p>To keep the state normalized all updates should normalize the data first</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="3"><p>The <code>normalizePlaylists</code> is a function exported from the schema definition file (one of previous slides)</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8"><p><code>action.payload</code> is the denormalized API response</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>Update the application state with fully normalized entities</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="22-32"><p>The normalized state, while easy to manage,
+is not useful to components and requries some transformation</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="23"><p>Get currently viewed playlist. The data is normalized and it's denormalization quite complicated - there are multiple levels of nesting.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="24-28"><p>Use the <code>denormalize</code> utility from <code>normalizr</code>,
+passing in normalized data, the normalization schema,
+and all relevant entities.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="26"><p>The <code>playlistSchema</code> is defined on earlier slide.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Immutable data structures</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Basics of immutable structures</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">import {Map, List, fromJS} from &#39;immutable&#39;;
+
+const mutableCollection = [1, 2, 3];
+mutableCollection.push(4);
+// mutableCollection =&gt; [1, 2, 3, 4]
+
+const immutableCollection = List([1, 2, 3]);
+immutableCollection.push(4);
+// immutableCollection =&gt; [1, 2, 3]
+
+const mutableObject = { foo: 1, bar: 2 };
+console.log(mutableObject.foo); // 1
+mutableObject.bar = &#39;baz&#39;;
+// mutableObject =&gt; { foo: 1, bar: &#39;baz&#39; }
+
+const immutableObject = Map({ foo: 1, bar: 2});
+immutableObject.get(&#39;foo&#39;); // 1
+immutableObject.set(&#39;bar&#39;, &#39;baz&#39;);
+// immutableObject =&gt; { foo: 1, bar: 2 }
+
+const immutableStructure = fromJS({ /* properties */ });
+const mutableAgain = immutableStructure.toJS();
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="3-5"><p>Mutable collection (aka regular array) can be changed with methods or overiding the data</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="7-9"><p>Immutable collections are called <code>List</code>s.
+Pushing to a <code>List</code> will return a new instance.
+Original <code>List</code> will be unchanged.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11-14"><p>Same principle applies to objects.
+Plain JS objects can be easily modified.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="16-19"><p>Immutable objects are called <code>Map</code>s.
+They are less straight-forward to access (<code>.get</code>), but will return a new object after <code>set</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>Converting deeply nesting structures to Immutable is easy with <code>fromJS</code> utility</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="22"><p>Each of Immutablejs structures has a <code>toJS</code> method that allows to convert the structure back to plan JS.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Using immutable data with redux</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">import {Map, fromJS} from &#39;immutable&#39;;
+
+const defaultState = Map();
+
+function reducer(state = defaultState, action) {
+    switch (action.type) {
+        case &#39;UPDATE_STATE&#39;:
+            return state.merge(action.payload);
+
+        case &#39;ADD_ITEM&#39;:
+            const items = state.get(&#39;items&#39;)
+                .push(Map(action.payload));
+
+            return state.merge({ items });
+
+        default:
+            return state;
+    }
+}
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="3"><p>Define the <code>defaultState</code> for this reducer as an immutable <code>object</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8"><p>General state updates can be handled with <code>merge</code> or <code>mergeDeep</code> utilities</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11-12"><p>Actions that create more specific updates need custom logic.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12"><p><strong>Never</strong> <code>set</code> or <code>push</code> mutable object to otherwise immutable structure.
+Regular objects need to be converted to immutable with proper constructor function.
+When in doubt use <code>fromJS</code>. <code>merge</code> and <code>mergeDeep</code> are safe too.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux-saga<small class="dm-slide__title__subtitle">Typed Javascript with Flow</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setting up the store</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript"></code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>Install required packages</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="10"><p>Create a socket connection using the <code>socket.io</code> library</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11"><p>Create the middleware for handling sockets. It takes the socket as first argument.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11"><p>The second argument is the <em>socket action prefix</em>:
+in this example, all actions prefixed with <code>SERVER/</code> (<code>SERVER/ADD_TODO</code>, etc) will emit a message through the socket</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13-16"><p>Standard store setup</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Performance<small class="dm-slide__title__subtitle">Optimizing React and Redux for best performance</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Measuring the performance</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">store.js</strong><code class="dm-code__editor hljs javascript">// npm install --save-dev react-addons-perf
+if (process.env.NODE_ENV !== &#39;production&#39;) {
+    window.Perf = require(&#39;react-addons-perf&#39;);
+}
+
+/* ... */
+
+
+/* BROWSER CONSOLE */
+&gt; Perf.start()
+/* ... */
+&gt; Perf.stop();
+&gt; Perf.getLastMeasurements();
+&gt; Perf.printExclusive();
+&gt; Perf.printWasted();
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:60%;flex-basis:60%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Install the <code>react-addons-perf</code> package</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="2-4"><p>Import and assign to the <code>window</code> object to make it available
+via console in the browser</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Proceed with normal React setup</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>All following commands will be issued in the browser's console</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="10"><p>Start measuring performance</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11"><p>Use the app</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12"><p>Stop the measurement</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13"><p>Get the total render count/time for every component.
+Useful to get an overview on which components are slow.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14"><p>More detailed view of the same measurements.
+Doesn't include the time of mounting components.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15"><p>Shows renders that happened (the <code>render</code> function was called)
+but resulted in no changes in DOM.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Why did you update?</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">index.js</strong><code class="dm-code__editor hljs javascript">// npm install --save-dev why-did-you-update
+import React from &#39;react&#39;
+
+if (process.env.NODE_ENV !== &#39;production&#39;) {
+    const {whyDidYouUpdate} = require(&#39;why-did-you-update&#39;);
+    whyDidYouUpdate(React);
+}
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Install the <code>why-did-you-update</code> package</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5"><p>Import the setup function</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Start reporting unnecessary rerenders</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="1-9"><div class="l-column-fit"><img class="l-island" src="de1a2ab2d7ba6c7e4a5c8a51abc4a4ab.png">Enjoy!</div></div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Common performance anti-patterns</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Binding context in callbacks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:70%;flex-basis:70%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">class ComponentA extends React.Component {
+    handleUserAction(e) {
+        // ...
+    }
+
+    render() {
+        return (
+            &lt;button onClick={this.handleUserAction.bind(this)}&gt;
+                Click
+            &lt;/button&gt;
+        );
+    }
+}
+
+class ComponentB extends React.Component {
+    handleUserAction() {
+        // ...
+    }
+
+    render() {
+        return (
+            &lt;button onClick={(e) =&gt; this.handleUserAction(e)}&gt;
+                Click
+            &lt;/button&gt;
+        );
+    }
+}
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:30%;flex-basis:30%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-13"><p><code>ComponentA</code> wants to pass a callback to its children.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="2-4"><p>The callback uses <code>this</code> to reference the current <code>ComponentA</code> instance.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8"><p>Common solution: bind the function context in the component's render.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8-10"><p>Antipattern: the children component tree (or DOM) needs to be rerendered,
+because <code>.bind</code> returns a new function every time.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15-27"><p><code>ComponentB</code> attempts to solve the same issue</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="22"><p>Instead of using <code>.bind</code> it uses an arrow function to keep the context.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="22-24"><p>Same issue as before: new function created with every render</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Fixing callbacks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:70%;flex-basis:70%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">class ComponentA extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleUserAction = this.handleUserAction.bind(this);
+    }
+
+    render() {
+        return (
+            &lt;button onClick={this.handleUserAction}&gt;
+                Click
+            &lt;/button&gt;
+        );
+    }
+}
+
+class ComponentB extends React.Component {
+    handleUserAction = () =&gt; {
+        // ...
+    }
+
+    render() {
+        return (
+            &lt;button onClick={this.handleUserAction}&gt;
+                Click
+            &lt;/button&gt;
+        );
+    }
+}</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:30%;flex-basis:30%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-13"><p><code>ComponentA</code> was rewritten to avoid the anti-pattern.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4"><p>The callback is bound to the component's instance in the constructor.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p><code>this.handleUserAction</code> references the same function every time the <code>ComponentA</code> renders.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9-11"><p>React will have no trouble to recognize that there was no change; no rerendering of children will happen</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="16-28"><p><code>ComponentB</code> solves the issue in more modern way</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="17-19"><p>Instead of using <code>.bind</code> in constructor define the method as an arrow function.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="17-19"><p><strong>Important!</strong> Class properties <strong>will not work</strong> in pure ES2015+ right now.
+It's a <code>stage-2</code> proposal to the language.
+Enabled by default in <code>create-react-app</code>.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Providing defaults</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:70%;flex-basis:70%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">class BadComponent extends React.Component {
+    render() {
+        const options = this.props.options || {};
+
+        return (
+            &lt;AnotherComponent options={options} /&gt;
+        );
+    }
+}
+
+class GoodComponent extends React.Component {
+    defaultOptions = {};
+
+    render() {
+        const options = this.props.options || this.defaultOptions;
+
+        return (
+            &lt;AnotherComponent options={options} /&gt;
+        );
+    }
+}
+
+class AlsoGoodComponent extends React.Component {
+    static defaultProps = {
+        options: {}
+    };
+
+    render() {
+        const options = this.props.options;
+
+        return (
+            &lt;AnotherComponent options={options} /&gt;
+        );
+    }
+}
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:30%;flex-basis:30%;"><div class="current-only fragment dm-code-focus" data-code-focus="6"><p><code>BadComponent</code> provides some options to it's child component.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="3"><p>In case it didn't recieve the options as props, the empty object is provided as default.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5-7"><p>Anitpattern: Much like with callbacks, <code>AnotherComponent</code> will be rendered every time.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11-21"><p>Solution: the default options must be shared between rerenders</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12"><p><code>GoodComponent</code> uses a class property to make sure that <code>defaultOptions</code> is the same object everytime.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="24-26"><p><code>AlsoGoodComponent</code> uses the React's <code>defaultProps</code> feature.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Avoiding children rerenders</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:70%;flex-basis:70%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">class BadComponent extends React.Component {
+    /* ... */
+
+    render() {
+        return (
+            &lt;FastComponent /*props*/&gt;
+                &lt;ChildComponent /&gt;
+            &lt;/FastComponent&gt;
+        );
+    }
+}
+
+
+class GoodComponent extends React.Component {
+    childComponent = &lt;ChildComponent /&gt;;
+
+    render() {
+        return (
+            &lt;FastComponent /*props*/&gt;
+                {this.childComponent}
+            &lt;/FastComponent&gt;
+        );
+    }
+}
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:30%;flex-basis:30%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-11"><p><code>BadComponent</code> renders a well-optimized <code>FastComponent</code> and provides it's child: the <code>ChildComponent</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6-8"><p>JSX is just syntax-sugar over <code>React.createElement</code> which returns the node.
+Calling the function returns a new object every time.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p>Nested elements are passed as <code>children</code> prop to the component.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6-8"><p>Antipattern: <code>FastComponent</code> will rerender, because one of it's props (<code>children</code>) is different with every <code>BadComponent</code> render.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14-24"><p>Solution: cache the <code>ChildComponent</code> in a class property.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Using types with React<small class="dm-slide__title__subtitle">Typed Javascript with Flow</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Installing flow</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">console</strong><code class="dm-code__editor hljs javascript">/** CONSOLE **/
+npm install --save-dev flow-bin
+
+/** PACKAGE.JSON **/
+{
+    /* ... */
+    &quot;scripts&quot;: {
+        &quot;start&quot;: &quot;react-scripts start&quot;,
+            &quot;build&quot;: &quot;react-scripts build&quot;,
+            &quot;test&quot;: &quot;react-scripts test --env=jsdom&quot;,
+            &quot;eject&quot;: &quot;react-scripts eject&quot;,
+            &quot;flow&quot;: &quot;flow&quot;
+    }
+}
+
+/** CONSOLE **/
+npm run flow init
+
+npm start
+
+npm run flow
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:60%;flex-basis:60%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-2"><p>Install the <code>flow-bin</code> package with <code>npm</code> or <code>yarn</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12"><p>Add the <code>flow</code> script to the <code>scripts</code> section of <code>package.json</code>. Not necessary if installing via <code>yarn</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="16-17"><p>Run the initialization script with <code>flow init</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="19"><p>Start the app normally, the <code>create-react-app</code> will check the types automatically.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>Running the <code>flow</code> script will also check types</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Types in flow</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">console</strong><code class="dm-code__editor hljs javascript">/* @flow */
+
+const bar: number = 2;
+
+function foo(x: ?string): string {
+    if (x) {
+        return x;
+    }
+    return &quot;default string&quot;;
+}
+
+const arrayOfNumbers: number[] = [1, 2, 3];
+
+interface Circle {
+    position: ?{
+        x: number,
+        y: number
+    }
+    radius: number;
+
+    area(): number;
+}
+
+const circle: Circle = {
+    radius: 2,
+    area() {
+        return Math.PI * this.radius * this.radius;
+    }
+};
+
+class Foo {
+    bar() {}
+}
+
+const fooInstance: Foo = new Foo();</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:60%;flex-basis:60%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Mark the file as flow-typed with the <code>@flow</code> directive</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="3"><p>Declare variable types with the <code>variableName: type</code> syntax</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5"><p>Function's arguments can be typed too</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5"><p>Optional arguments are marked with the <code>?</code> character prefixing the type</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5"><p>Function's return type is defined after the argument list</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12"><p>Array types are defined using the <code>Type[]</code> syntax</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13-21"><p>Custom types can be defined using <code>interfaces</code>.
+Interfaces exists only for typing purposes and do not appear in compiled code.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15-18"><p>Complex types can also be defined inline.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>Interfaces can define typing for methods as well.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="24-29"><p>Interface can be used in the same way as any other type</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="31-33"><p>Another way to define a type is to use a <code>class</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="35"><p>All instances of class <code>Foo</code> are of type <code>Foo</code>.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Using flow with React</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">console</strong><code class="dm-code__editor hljs javascript">/* @flow */
+
+const bar: number = 2;
+
+function foo(x: ?string): string {
+    if (x) {
+        return x;
+    }
+    return &quot;default string&quot;;
+}
+
+const arrayOfNumbers: number[] = [1, 2, 3];
+
+interface Circle {
+    position: ?{
+        x: number,
+        y: number
+    }
+    radius: number;
+
+    area(): number;
+}
+
+const circle: Circle = {
+    radius: 2,
+    area() {
+        return Math.PI * this.radius * this.radius;
+    }
+};
+
+class Foo {
+    bar() {}
+}
+
+const fooInstance: Foo = new Foo();</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>The <code>@flow</code> directive is necessary in every file</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12-25"><p><code>state</code> and <code>props</code> are important properties to type for a React component</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="3-6"><p>Create an interface for the <code>state</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4"><p>The <code>+</code> prefix means that the property is read-only.
+The state should be considered read-only, as it is only changed via <code>setState</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8-10"><p>Same goes for the <code>props</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13-15"><p>Provide type and initial value for the <code>state</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="17"><p>Provide type for the <code>props</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="19-21"><p>Flow will recognize that properties in <code>defaultProps</code> should be considered optional</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Testing React & Redux</h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Introducing Jest - the testing lib for React apps</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">./services/Service.test.js</strong><code class="dm-code__editor hljs javascript">class Service {
+    foo = 6;
+
+    bar(value) {
+        return Boolean(value);
+    }
+}
+
+describe(&#39;Service&#39;, () =&gt; {
+    let instance;
+
+    beforeEach(() =&gt; {
+        instance = new Service();
+    });
+
+    it(&#39;has `foo` property&#39;, () =&gt; {
+        expect(instance.foo).toBe(6);
+    });
+
+    describe(&#39;#bar&#39;, () =&gt; {
+        it(&#39;returns true if passed truthy value&#39;, () =&gt; {
+            expect(instance.bar(true)).toBe(true);
+        });
+    });
+});
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-26"><p>To properly work with the default <code>create-react-app</code> config,
+all tests are in files which names end with <code>.test.js</code>.
+For example, if <code>MyComponent</code> is in file <code>MyComponent.js</code>,
+it's tests should be in file called <code>MyComponent.test.js</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9-25"><p>Tests are grouped in <code>describe</code> blocks.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>The top level <code>describe</code> is actually optional:
+properly naming the file should be enough,
+provided there is only one class/service/component per file</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12-14"><p>Code in <code>beforeEach</code> block will be run before each test.
+This block should be used for initialization of fixtures/common setup.
+There should be no shared state between tests.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="16-18"><p>A test is a function (<code>it</code> or <code>test</code>) that takes 2 arguments:
+the test <code>description</code> and a function that will contain expectations</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="17"><p>The <code>expect</code> function is used for testing values.
+It is followed by a matcher -- a function that asserts something about the value.
+In this case it's <code>toBe</code> which checks equality</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="20-24"><p><code>describe</code> blocks can be nested, along with their own <code>beforeEach</code>/<code>afterEach</code> functions.
+Nested <code>describes</code> are using for grouping tests.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Testing components</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Smoke tests - just checking</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">MyComponent.test.js</strong><code class="dm-code__editor hljs javascript">import React from &#39;react&#39;;
+import ReactDOM from &#39;react-dom&#39;;
+import MyComponent from &#39;./MyComponent&#39;;
+
+describe(&#39;&lt;MyComponent/&gt;&#39;, () =&gt; {
+    it(&#39;renders without crashing&#39;, () =&gt; {
+        const div = document.createElement(&#39;div&#39;);
+        ReactDOM.render(&lt;MyComponent /&gt;, div);
+    });
+})
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-11"><p>By far the simplest test of React component test is a <em>smoke test</em>:
+just seeing if there are no errors when using the component.
+It's <strong>often</strong> enough for functional/presentational components that have no logic</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="1-2"><p>Import required React packages</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="3"><p>Import the component</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6-9"><p>Try to render the component into a div</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6-9"><p>This test has no <code>expect</code> statements. It will pass unless an error is thrown.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8"><p>Note: this is not exactly unit testing: if there are no errors,
+then entire component subtree will be rendered.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Shallow rendering</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">MyComponent.test.js</strong><code class="dm-code__editor hljs javascript">import React from &#39;react&#39;;
+import { shallow } from &#39;enzyme&#39;;
+
+import MyComponent from &#39;./MyComponent&#39;;
+
+describe(&#39;&lt;MyComponent/&gt;&#39;, () =&gt; {
+    it(&#39;renders the button&#39;, () =&gt; {
+        const wrapper = shallow(&lt;MyComponent&gt;Hello&lt;/MyComponent&gt;);
+        expect(wrapper.contains(&lt;button&gt;Hello&lt;/button&gt;)).toBe(true);
+    });
+})
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-12"><p><code>Enzyme</code> lib, especially the <code>shallow</code> renderer are used for proper unit-testing React components</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="2"><p>Instead of the standard <code>ReactDOM</code>, the rendering will be handled by <code>shallow</code> renderer from <code>enzyme</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8"><p>Use it to render <code>&lt;MyComponent /&gt;</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="8"><p>The component will not try to render any of other React components that are children to <code>&lt;MyComponent/&gt;</code>.
+They will be treat as normal HTML elements instead.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p><code>wrapper</code> is a smart wrapper over a React node, that exposes various API to query and interact with the subtree</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Snapshots</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">MyComponent.test.js</strong><code class="dm-code__editor hljs javascript">import React from &#39;react&#39;;
+import renderer from &#39;react-test-renderer&#39;;
+
+import MyComponent from &#39;./MyComponent&#39;;
+
+it(&#39;renders correctly&#39;, () =&gt; {
+    const tree = renderer.create(
+        &lt;MyComponent message=&quot;Hello!&quot;&gt;
+            Click here!
+        &lt;/MyComponent&gt;
+    ).toJSON();
+
+    expect(tree).toMatchSnapshot();
+});
+
+
+/** SNAPSHOT **/
+exports[`renders correctly 1`] = `
+&lt;div className=&quot;my-component&quot;&gt;
+  &lt;button onClick={[Function]}&gt;Click here!&lt;/button&gt;
+&lt;/div&gt;
+`;
+
+
+/** CHANGED TEST **/
+it(&#39;renders correctly&#39;, () =&gt; {
+    const tree = renderer.create(
+        &lt;MyComponent message=&quot;Hello!&quot;&gt;
+            And now here!
+        &lt;/MyComponent&gt;
+    ).toJSON();
+
+    expect(tree).toMatchSnapshot();
+});
+
+/** CONSOLE **/
+jest --updateSnapshot
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-38"><p>Snapshots are used to prevent accidental changes of UI</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="2"><p>Import <code>renderer</code> that will render the component instead of the usual <code>ReactDOM</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="7-11"><p>Use it to render <code>&lt;MyComponent /&gt;</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="7-11"><p>The <code>renderer.create</code> method returns a JS object representing the rendered component</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13"><p>Use the <code>toMatchSnapshot</code> to check if generated tree matches the previously saved snapshot</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6-14"><p>This test will pass the first time it's run, because there is no snapshot to match against.
+At the same time the snapshot will be created.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="17-22"><p>The snapshot is JSX-like representation of the rendered subtree.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="17-22"><p>Snapshots are saved to a file with <code>.snap</code> extension that should be checked into the VCS</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="25-34"><p>If the test or the component are modified, matching against the snapshot will fail</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="36-37"><p>Replace old snapshots with new version</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Testing Redux</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Regular action creators</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">MyComponent.test.js</strong><code class="dm-code__editor hljs javascript">/** ACTION CREATOR **/
+export function addTodo(text) {
+    return {
+        type: &#39;ADD_TODO&#39;,
+        payload: {
+            text,
+            completed: false
+        }
+    };
+}
+
+
+/** TEST **/
+describe(&#39;addTodo&#39;, () =&gt; {
+    it(&#39;returns action with correct type&#39;, () =&gt; {
+        const action = addTodo(&#39;Learn React&#39;);
+        expect(action.type).toBe(&#39;ADD_TODO&#39;);
+    });
+
+    it(&#39;returns action with the todo in payload&#39;, () =&gt; {
+        const action = addTodo(&#39;Learn React&#39;);
+        expect(action.payload.text).toBe(&#39;Learn React&#39;);
+    });
+});
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-25"><p>Synchronous action creators are usually very simple functions, so testing is staright-forward</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="1-10"><p>An action creator straight from the world's most popular React application</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15-18"><p>Check for correct type</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="20-23"><p>Check for correct payload</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13-24"><p>Such simple action creators are commonly tested indirectly when testing reducers
+and have no tests on their own</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Reducers</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">MyComponent.test.js</strong><code class="dm-code__editor hljs javascript">import todos from &#39;reducers/todos&#39;;
+
+describe(&#39;todos reducer&#39;, () =&gt; {
+    it(&#39;handles ADD_TODO&#39;, () =&gt; {
+        const state = todos([], addTodo(&#39;Test AddTodo&#39;));
+        const expected = [
+            {
+                text: &#39;Test AddTodo&#39;,
+                completed: false
+            }
+        ];
+
+        expect(state).toEqual(expected);
+    });
+});
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-16"><p>Reducers are <strong>pure functions</strong>, which makes them very easy to test</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Import the reducer</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5"><p>The reducer takes current <code>state</code> and an <code>action</code> and returns new <code>state</code>.
+Normally this bit would be called by Redux.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6-11"><p>Define the expected shape of new <code>state</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="13"><p>Perform deep equality check with <code>toEqual</code> matcher.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Visual testing with Storybook</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setup the storybook</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** CONSOLE **/
+npm i -g @storybook/cli
+
+/** IN PROJECT DIRECTORY **/
+getstorybook
+
+npm run storybook
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-2"><p>Install the <code>storybook</code> command line tool</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="4-5"><p>In the main project directory run the <code>getstorybook</code> command,
+which will setup the storybook for current application</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Start the storybook app. Go to <code>http://localhost:9009/</code> to see the example storybook.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="1-8"><p>The storybook loads stories defined in <code>src/stories/index.js</code> or <code>src/stories.js</code> files.
+Delete to file contents to remove the default stories.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Creating a story</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">MyComponent.stories.js</strong><code class="dm-code__editor hljs javascript">/** CONSOLE **/
+npm i -g @storybook/cli
+
+/** IN PROJECT DIRECTORY **/
+getstorybook
+
+npm run storybook
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-8"><p>By convention, the stories for given component are defined in the same directory in file called <code>COMPONENT_NAME.stories.js</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>Required imports</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="5"><p>Create a group of stories; should be called the same as the component under test</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Add a story with name and a function that returns the component with certain params</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p>Add more stories with different params</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="10-11"><p>Remember to import component stories into the main stories file</p>
+</div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_d871d0962e16ac0f2558.js"></script><script type="text/javascript" src="bundle_d871d0962e16ac0f2558.js"></script></body></html>
