@@ -1,0 +1,56 @@
+extends ~layouts/columns
+
+block title
+    | Setting up
+
+block content
+    +slide_column(60)
+        +code(null, 'javascript')
+            include:escape ./saga-actions.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-29').current-only
+            :markdown-it
+                Let's rewrite the thunk timer example to sagas
+
+        +code_focus('1-8').current-only
+            :markdown-it
+                The action creators remained almost unchanged;
+                the `runTimer` action creator was removed
+
+        +code_focus('12-13').current-only
+            :markdown-it
+                Import utilities from the `redux-saga` lib
+
+        +code_focus('15-17').current-only
+            :markdown-it
+                The `timerSaga` watches for `TIMER_START` actions using the `takeEvery` effect.
+                When such action is dispached it will call the `runTimer` saga with the action.
+
+        +code_focus('19-22').current-only
+            :markdown-it
+                The `runTimer` saga is tasked with handling individual actions
+
+        +code_focus('19').current-only
+            :markdown-it
+                It receives the `action` object as an argument
+
+        +code_focus('20').current-only
+            :markdown-it
+                The `delay` effect returns a promise that will be resolved after N miliseconds.
+
+        +code_focus('20').current-only
+            :markdown-it
+                `yield`ing the promise to saga's middleware will cause the execution of `runTimer` to pause until the promise is resolved.
+
+        +code_focus('21').current-only
+            :markdown-it
+                After the scheduled delay, `runTimer` will `put` the `TIMER_END` action.
+
+        +code_focus('21').current-only
+            :markdown-it
+                Using `put` will dispatch the action that was passed in
+
+        +code_focus('25-26').current-only
+            :markdown-it
+                Use the saga middleware to run the `timerSaga`.

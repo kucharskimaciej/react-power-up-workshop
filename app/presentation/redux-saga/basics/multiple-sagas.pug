@@ -1,0 +1,33 @@
+extends ~layouts/columns
+
+block title
+    | Running multiple sagas
+
+block content
+    +slide_column(60)
+        +code(null, 'javascript')
+            include:escape ./setup.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('23').current-only
+            :markdown-it
+                The `.run` method on saga middleware can only run a single saga
+
+        +code_focus('4-6').current-only
+            :markdown-it
+                Import all required sagas
+
+        +code_focus('8-14').current-only
+            :markdown-it
+                Create a top-level saga
+
+        +code_focus('9-13').current-only
+            :markdown-it
+                Run all sagas in parallel using the `all` utility.
+
+        +code_focus('25').current-only
+            :markdown-it
+                Run the top-level saga on the middleware
+
+
+
