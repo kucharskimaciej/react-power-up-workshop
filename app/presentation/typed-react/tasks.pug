@@ -1,0 +1,20 @@
+extends ~layouts/columns
+
+block title
+    | Tasks
+
+block content
+    +slide_column()
+        .l-column-fit
+            +task('basic')
+                | Annotate Redux reducers and actions with Flow
+
+            +task('basic')
+                | Add Flow annotations to a component of your choice
+
+            +task('optional')
+                | Add Flow annotations to sagas
+
+            +task('optional')
+                | Annotate all the components
+

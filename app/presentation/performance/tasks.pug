@@ -1,0 +1,20 @@
+extends ~layouts/columns
+
+block title
+    | Tasks
+
+block content
+    +slide_column()
+        .l-column-fit
+            +task('basic')
+                | Replace `React.Component` with `PureComponent` where appropriate
+
+            +task('basic')
+                | Remove the performance anti-patterns from the application's code
+
+            +task('optional')
+                | Optimize selectors using `reselect`
+
+            +task('optional')
+                | Remove wasted rerenders (`perf-addon`/`why-did-you-update`)
+

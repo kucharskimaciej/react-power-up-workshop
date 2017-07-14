@@ -1,0 +1,28 @@
+extends ~layouts/columns
+
+block title
+    | Tasks
+
+block content
+    +slide_column()
+        .l-column-fit
+            +task('basic')
+                | Load the LISTS from the server // @todo: link REST API to docs
+
+            +task('basic')
+                | Push task updates to the server // @todo: link REST API to docs
+
+            +task('optional')
+                | Handle list management: adding and removing lists // @todo: link REST API to docs
+
+            +task('optional')
+                | Subscribe to task updates via websockets // @todo: link to WEBSOCKETS API docs
+
+            +task('optional')
+                | Subscribe to list updates via websockets // @todo: link to WEBSOCKETS API docs
+
+            +task('optional')
+                | Add authentication // @todo: link to REST API docs
+
+            +task('optional')
+                | Display a toast (notification) every time a list or task is updated // @todo: link to WEBSOCKETS API docs

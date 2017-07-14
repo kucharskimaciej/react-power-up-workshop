@@ -1,0 +1,28 @@
+extends ~layouts/columns
+
+block title
+    | Tasks
+
+block content
+    +slide_column()
+        .l-column-fit
+            +task('basic')
+                | Unit test a reducer
+
+            +task('basic')
+                | Create a smoke test for a component of your choice
+
+            +task('basic')
+                | Use `enzyme` to shallow render and test a component
+
+            +task('basic')
+                | Setup `storybook` and create a couple of stories for a component
+
+            +task('optional')
+                | Create a snapshot test of one of the components
+
+            +task('optional')
+                | Use `enzyme` to test interactions of a component (ie. responding to `onClick`
+
+            +task('optional')
+                | Use `storybook` to develop a new component

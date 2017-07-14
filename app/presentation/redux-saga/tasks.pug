@@ -1,0 +1,22 @@
+extends ~layouts/columns
+
+block title
+    | Tasks
+
+block content
+    +slide_column()
+        .l-column-fit
+            +task('basic')
+                | Rewrite the REST API calls to use sagas instead of thunks
+
+            +task('optional')
+                | Create a saga that handles websocket task update events
+
+            +task('optional')
+                | Create a saga that handles websocket list update events
+
+            +task('optional')
+                | Create a saga that handles notifications
+
+            +task('optional')
+                | Create a saga that handles authentication
