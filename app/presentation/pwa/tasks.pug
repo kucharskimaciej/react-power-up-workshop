@@ -7,11 +7,19 @@ block content
     +slide_column()
         .l-column-fit
             +task('basic')
-                | Replace `React.Component` with `PureComponents` where appropriate
+                | Create a service worker for caching the page
 
             +task('basic')
-                | Remove the performance antipatterns from the application's code
+                | Add server-rendering for the main application view (no routing)
+
+            +task('basic')
+                | Use lighthouse to find out if there are problems
 
             +task('optional')
-                | Remove wasted rerenders (`perf-addon`/`why-did-you-update`)
+                | Create a custom offline page
 
+            +task('optional')
+                | Use precache
+
+            +task('optional')
+                | Add routing to server-side rendered application
