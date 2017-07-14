@@ -67,60 +67,6 @@ store.dispatch(runTimer(5));
 </div><div class="current-only fragment dm-code-focus" data-code-focus="17"><p>At first it will dispatch the <code>TIMER_START</code> action</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="13-15"><p>After the delay, dispatch <code>TIMER_END</code> action</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="21"><p>Still dispatches like a regular action</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setup react-router with Redux</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/* INSTALLATION */
-// npm install --save react-router-redux@next
-// npm install --save history
-
-import { createStore, combineReducers, applyMiddleware } from &#39;redux&#39;;
-import { routerReducer, routerMiddleware } from &#39;react-router-redux&#39;;
-import createBrowserHistory from &#39;history/createBrowserHistory&#39;;
-
-export const history = createBrowserHistory();
-const middleware = routerMiddleware(history);
-
-export const store = createStore(
-    combineReducers({
-        /* ...reducers, */
-        router: routerReducer
-    }),
-    applyMiddleware(middleware)
-)
-</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>Install the required packages</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="2"><p>Remember to add the <code>@next</code> suffix -
-the default version of <code>react-router-redux</code> works only with old <code>react-router</code> versions</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p><code>history</code> is a library that allows easy management of session history via JS.
-The <code>createBrowserHistory</code> method is using HTML5 History API and should be used with new browsers.</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>Create and export a <code>history</code> instance for the application</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="10"><p>Setup routing middleware to use the <code>history</code>instance</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="12-18"><p>Standard store setup with multiple reducers and a middleware</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="15"><p>Routing state is in the <code>router</code> sub-tree of the application state</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Use the Redux router</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">import React from &#39;react&#39;
-import ReactDOM from &#39;react-dom&#39;
-
-import { Provider } from &#39;react-redux&#39;;
-import { Route } from &#39;react-router&#39;;
-import { ConnectedRouter } from &#39;react-router-redux&#39;;
-
-import {history, store} from &quot;./store&quot;
-
-ReactDOM.render(
-    &lt;Provider store={store}&gt;
-        &lt;ConnectedRouter history={history}&gt;
-            &lt;div&gt;
-                &lt;Route exact path=&quot;/&quot; component={Home}/&gt;
-                &lt;Route path=&quot;/about&quot; component={About}/&gt;
-            &lt;/div&gt;
-        &lt;/ConnectedRouter&gt;
-    &lt;/Provider&gt;,
-    document.getElementById(&#39;root&#39;)
-)
-
-</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-5"><p>Standard imports for the router component</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Instead of <code>Router</code> or <code>BrowserRouter</code> import the <code>ConnectedRouter</code></p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="11-18"><p>Standard Redux setup</p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="12-17"><p>The <code>&lt;ConnectedRouter /&gt;</code> component should be a child of the <code>&lt;Provider /&gt;</code>
-so that it knows to use the application's <code>store</code></p>
-</div><div class="current-only fragment dm-code-focus" data-code-focus="14-15"><p>Setting up <code>&lt;Route /&gt;</code>'s is the same as before</p>
 </div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Working with websockets</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setting up the store</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** CONSOLE **/
 npm install --save socket.io
 npm install --save redux-socket.io
@@ -186,7 +132,61 @@ socket.on(&#39;action&#39;, (action) =&gt; {
 </div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>Dispatch the action as usual</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="12-21"><p>The server will receive <code>action</code> event, with the action as payload</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="14-15"><p>The action will be handled depending on its type</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux best practises<small class="dm-slide__title__subtitle">Tools for the best experience</small></h1></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Handling denormalized data</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Denormalized state</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs json">[
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Tasks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:undefined%;flex-basis:undefined%;"><div class="l-column-fit"><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Load the LISTS from the server // @todo: link REST API to docs</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Push task updates to the server // @todo: link REST API to docs</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Handle list management: adding and removing lists // @todo: link REST API to docs</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Subscribe to task updates via websockets // @todo: link to WEBSOCKETS API docs</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Subscribe to list updates via websockets // @todo: link to WEBSOCKETS API docs</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Add authentication // @todo: link to REST API docs</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Display a toast (notification) every time a list or task is updated // @todo: link to WEBSOCKETS API docs</div></article></div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux best practises<small class="dm-slide__title__subtitle">Tools for the best experience</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setup react-router with Redux</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/* INSTALLATION */
+// npm install --save react-router-redux@next
+// npm install --save history
+
+import { createStore, combineReducers, applyMiddleware } from &#39;redux&#39;;
+import { routerReducer, routerMiddleware } from &#39;react-router-redux&#39;;
+import createBrowserHistory from &#39;history/createBrowserHistory&#39;;
+
+export const history = createBrowserHistory();
+const middleware = routerMiddleware(history);
+
+export const store = createStore(
+    combineReducers({
+        /* ...reducers, */
+        router: routerReducer
+    }),
+    applyMiddleware(middleware)
+)
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-3"><p>Install the required packages</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="2"><p>Remember to add the <code>@next</code> suffix -
+the default version of <code>react-router-redux</code> works only with old <code>react-router</code> versions</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p><code>history</code> is a library that allows easy management of session history via JS.
+The <code>createBrowserHistory</code> method is using HTML5 History API and should be used with new browsers.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9"><p>Create and export a <code>history</code> instance for the application</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="10"><p>Setup routing middleware to use the <code>history</code>instance</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12-18"><p>Standard store setup with multiple reducers and a middleware</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15"><p>Routing state is in the <code>router</code> sub-tree of the application state</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Use the Redux router</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">import React from &#39;react&#39;
+import ReactDOM from &#39;react-dom&#39;
+
+import { Provider } from &#39;react-redux&#39;;
+import { Route } from &#39;react-router&#39;;
+import { ConnectedRouter } from &#39;react-router-redux&#39;;
+
+import {history, store} from &quot;./store&quot;
+
+ReactDOM.render(
+    &lt;Provider store={store}&gt;
+        &lt;ConnectedRouter history={history}&gt;
+            &lt;div&gt;
+                &lt;Route exact path=&quot;/&quot; component={Home}/&gt;
+                &lt;Route path=&quot;/about&quot; component={About}/&gt;
+            &lt;/div&gt;
+        &lt;/ConnectedRouter&gt;
+    &lt;/Provider&gt;,
+    document.getElementById(&#39;root&#39;)
+)
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-5"><p>Standard imports for the router component</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Instead of <code>Router</code> or <code>BrowserRouter</code> import the <code>ConnectedRouter</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11-18"><p>Standard Redux setup</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12-17"><p>The <code>&lt;ConnectedRouter /&gt;</code> component should be a child of the <code>&lt;Provider /&gt;</code>
+so that it knows to use the application's <code>store</code></p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14-15"><p>Setting up <code>&lt;Route /&gt;</code>'s is the same as before</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title"><small class="dm-slide__title__subtitle">Handling denormalized data</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Denormalized state</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs json">[
     {
       &quot;id&quot;: 0,
       &quot;user&quot;: { &quot;id&quot;: 0, &quot;name&quot;: &quot;Maciej&quot; },
@@ -417,7 +417,7 @@ function reducer(state = defaultState, action) {
 </div><div class="current-only fragment dm-code-focus" data-code-focus="12"><p><strong>Never</strong> <code>set</code> or <code>push</code> mutable object to otherwise immutable structure.
 Regular objects need to be converted to immutable with proper constructor function.
 When in doubt use <code>fromJS</code>. <code>merge</code> and <code>mergeDeep</code> are safe too.</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux-saga<small class="dm-slide__title__subtitle">Typed Javascript with Flow</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setting up</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">// npm install --save redux-saga
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Tasks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:undefined%;flex-basis:undefined%;"><div class="l-column-fit"><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Replace `react-router` with the Redux version</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Normalize the state using `normalizr`</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Convert the state to use immutable objects</div></article></div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Redux-saga<small class="dm-slide__title__subtitle">Typed Javascript with Flow</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Setting up</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">// npm install --save redux-saga
 
 import { createStore, applyMiddleware } from &#39;redux&#39;
 
@@ -696,7 +696,7 @@ Calling the function returns a new object every time.</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p>Nested elements are passed as <code>children</code> prop to the component.</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="6-8"><p>Antipattern: <code>FastComponent</code> will rerender, because one of it's props (<code>children</code>) is different with every <code>BadComponent</code> render.</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="14-24"><p>Solution: cache the <code>ChildComponent</code> in a class property.</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Using types with React<small class="dm-slide__title__subtitle">Typed Javascript with Flow</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Installing flow</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">console</strong><code class="dm-code__editor hljs javascript">/** CONSOLE **/
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Tasks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:undefined%;flex-basis:undefined%;"><div class="l-column-fit"><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Replace `React.Component` with `PureComponent` where appropriate</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Remove the performance anti-patterns from the application's code</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Optimize selectors using `reselect`</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Remove wasted rerenders (`perf-addon`/`why-did-you-update`)</div></article></div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Using types with React<small class="dm-slide__title__subtitle">Typed Javascript with Flow</small></h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Installing flow</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">console</strong><code class="dm-code__editor hljs javascript">/** CONSOLE **/
 npm install --save-dev flow-bin
 
 /** PACKAGE.JSON **/
@@ -813,7 +813,7 @@ The state should be considered read-only, as it is only changed via <code>setSta
 </div><div class="current-only fragment dm-code-focus" data-code-focus="13-15"><p>Provide type and initial value for the <code>state</code>.</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="17"><p>Provide type for the <code>props</code></p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="19-21"><p>Flow will recognize that properties in <code>defaultProps</code> should be considered optional</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Testing React & Redux</h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Introducing Jest - the testing lib for React apps</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">./services/Service.test.js</strong><code class="dm-code__editor hljs javascript">class Service {
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Tasks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:undefined%;flex-basis:undefined%;"><div class="l-column-fit"><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Annotate Redux reducers and actions with Flow</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Add Flow annotations to a component of your choice</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Add Flow annotations to sagas</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Annotate all the components</div></article></div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Testing React & Redux</h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Introducing Jest - the testing lib for React apps</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">./services/Service.test.js</strong><code class="dm-code__editor hljs javascript">class Service {
     foo = 6;
 
     bar(value) {
@@ -1017,4 +1017,4 @@ npm run storybook
 </div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Add a story with name and a function that returns the component with certain params</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p>Add more stories with different params</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="10-11"><p>Remember to import component stories into the main stories file</p>
-</div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_9935997b287a0cfa2017.js"></script><script type="text/javascript" src="bundle_9935997b287a0cfa2017.js"></script></body></html>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Tasks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:undefined%;flex-basis:undefined%;"><div class="l-column-fit"><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Unit test a reducer</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Create a smoke test for a component of your choice</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `enzyme` to shallow render and test a component</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Setup `storybook` and create a couple of stories for a component</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Create a snapshot test of one of the components</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `enzyme` to test interactions of a component (ie. responding to `onClick`</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `storybook` to develop a new component</div></article></div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_848af31991148a265d59.js"></script><script type="text/javascript" src="bundle_848af31991148a265d59.js"></script></body></html>
