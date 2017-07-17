@@ -1,0 +1,43 @@
+extends ~layouts/columns
+
+block title
+    | Setting up the cache
+
+block content
+    +slide_column(60)
+        +code('public/service-worker.js', 'js')
+            include:escape ./caching.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1').current-only
+            :markdown-it
+                The name identifies cache of the application and allows easy invalidation by simply changing the name
+
+        +code_focus('3').current-only
+            :markdown-it
+                When the user starts the application the `install` event will be triggered for the service worker.
+
+        +code_focus('5-6').current-only
+            :markdown-it
+                Load the application cache object
+
+        +code_focus('7-8').current-only
+            :markdown-it
+                Problem: in production environment `webpack` will add a hash to names of JS/CSS bundles
+
+        +code_focus('7-8').current-only
+            :markdown-it
+                It will also produce the `asset-manifest.json` file, which maps the default filenames to hashed ones.
+
+        +code_focus('10-14').current-only
+            :markdown-it
+                List of files to add to cache. `/` refers to the `index.html`.
+                Additional files, like fonts or images, can also be cached.
+
+        +code_focus('21-27').current-only
+            :markdown-it
+                `fetch` event is triggered whenever the browser requests a resource.
+
+        +code_focus('23-25').current-only
+            :markdown-it
+                Lookup the request in cache. If the response is there, return it immediately. Otherwise, proceed with fetch.

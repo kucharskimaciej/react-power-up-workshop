@@ -7,19 +7,29 @@ block content
     +slide_column()
         .l-column-fit
             +task('basic')
-                | Create a service worker for caching the page
+                :markdown-it
+                    Install `lighthouse` and inspect the page
 
             +task('basic')
-                | Add server-rendering for the main application view (no routing)
+                :markdown-it
+                    Register the service worker if to browser supports this feature
 
             +task('basic')
-                | Use lighthouse to find out if there are problems
+                :markdown-it
+                    Setup caching by handling the `install` and `fetch` events
 
             +task('optional')
-                | Create a custom offline page
+                :markdown-it
+                    Create a placeholder page to show before the app loads
 
             +task('optional')
-                | Use precache
+                :markdown-it
+                    Add the "Add to home screen" capability
 
             +task('optional')
-                | Add routing to server-side rendered application
+                :markdown-it
+                    Max out the lighthouse score
+
+            +task('optional')
+                :markdown-it
+                    Add offline-first features using `redux-offline`

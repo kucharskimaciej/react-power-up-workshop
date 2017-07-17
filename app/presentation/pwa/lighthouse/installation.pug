@@ -1,0 +1,23 @@
+extends ~layouts/columns
+
+block title
+    | Lighthouse
+
+block content
+    +slide_column(50).l-column-middle
+        .l-column-fit
+            img(src=require('presentation/pwa/lighthouse/lighthouse.png')).l-island
+
+    +slide_column(50).l-column-middle
+        +code_focus('1').current-only
+            :markdown-it
+                Install the `lighthouse` [chrome addon](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
+
+        +code_focus('2-4').current-only
+            :markdown-it
+                Any page can be inspected using extension
+
+        +code_focus('6').current-only
+            :markdown-it
+                `lighthouse` is using the [Google's PWA checklist](https://developers.google.com/web/progressive-web-apps/checklist)
+

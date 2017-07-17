@@ -1,0 +1,47 @@
+extends ~layouts/columns
+
+block title
+    | Add to home screen
+
+block content
+    +slide_column(60)
+        +code('public/manifest.json', 'json')
+            include:escape ./manifest.json
+
+    +slide_column(40).l-column-middle
+        +code_focus('1-15').current-only
+            :markdown-it
+                The `manifest.json` file describes how the application should be displayed
+                when added to phone's home screen
+
+        +code_focus('2').current-only
+            :markdown-it
+                The name to display below the icon
+
+        +code_focus('3').current-only
+            :markdown-it
+                The name to display on the splash screen while the app is starting up
+
+        +code_focus('5-9').current-only
+            :markdown-it
+                The icon to display
+
+        +code_focus('11').current-only
+            :markdown-it
+                URL that the app should open on. In this case, root url is just fine.
+
+        +code_focus('12').current-only
+            :markdown-it
+                The background color of the splashscreen. Ideally should match application background.
+
+        +code_focus('13').current-only
+            :markdown-it
+                Color of the chrome and navigation elements
+
+        +code_focus('14').current-only
+            :markdown-it
+                Display mode for the application: `standalone` stands for native-live look
+
+
+
+
