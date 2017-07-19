@@ -1104,4 +1104,122 @@ npm run storybook
 </div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>Add a story with name and a function that returns the component with certain params</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p>Add more stories with different params</p>
 </div><div class="current-only fragment dm-code-focus" data-code-focus="10-11"><p>Remember to import component stories into the main stories file</p>
-</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Tasks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:undefined%;flex-basis:undefined%;"><div class="l-column-fit"><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Unit test a reducer</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Create a smoke test for a component of your choice</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `enzyme` to shallow render and test a component</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Setup `storybook` and create a couple of stories for a component</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Create a snapshot test of one of the components</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `enzyme` to test interactions of a component (ie. responding to `onClick`</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `storybook` to develop a new component</div></article></div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_7e7dfbf87f75fab9225e.js"></script><script type="text/javascript" src="bundle_7e7dfbf87f75fab9225e.js"></script></body></html>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Tasks</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:undefined%;flex-basis:undefined%;"><div class="l-column-fit"><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Unit test a reducer</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Create a smoke test for a component of your choice</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `enzyme` to shallow render and test a component</div></article><article class="dm-task dm-task--basic undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Setup `storybook` and create a couple of stories for a component</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Create a snapshot test of one of the components</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `enzyme` to test interactions of a component (ie. responding to `onClick`</div></article><article class="dm-task dm-task--optional undefined"><div class="dm-task__difficulty"></div><div class="dm-task__body">Use `storybook` to develop a new component</div></article></div></div></div></div></section><section class="dm-slide dm-slide--title-page"><div class="dm-slide__content-wrapper"><h1 class="dm-slide-title">Server-side rendering</h1></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Injecting the store with initial state</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** STORE **/
+export function configureStore(initialState = {}) {
+    const store = createStore(
+        rootReducer,
+        initialState,
+        /* middlewares */
+    );
+
+    return store;
+}
+
+
+/** APP **/
+// import {store} from &#39;../store&#39;;
+import {configureStore} from &#39;../store&#39;;
+const store = configureStore(/* initial state */);
+
+class App extends React.Component {
+    render() {
+        return (
+            &lt;Provider store={store}&gt;
+                /* application code */
+            &lt;/Provider&gt;
+        );
+    }
+}
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:60%;flex-basis:60%;"><div class="current-only fragment dm-code-focus" data-code-focus="2-10"><p>Instead of creating the store immediately, export the <code>configureStore</code> function.
+This will enable the app to dynamically inject the initial state if needed.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14-16"><p>Store is created in the main app file</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="18-26"><p>Rest of the app runs as normal.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Creating a NodeJS server</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:60%;flex-basis:60%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">ssr/index.js</strong><code class="dm-code__editor hljs javascript">// yarn add ignore-styles babel-register express
+
+require(&#39;ignore-styles&#39;);
+require(&#39;babel-register&#39;)({
+    ignore: /\/(build|node_modules)\//,
+    presets: [&#39;env&#39;, &#39;react-app&#39;]
+});
+
+const express = require(&#39;express&#39;);
+const path = require(&#39;path&#39;);
+
+const app = express();
+
+app.get(&#39;/&#39;, require(&#39;./render&#39;));
+app.use(express.static(path.resolve(__dirname, &#39;..&#39;, &#39;build&#39;)));
+app.use(&#39;/&#39;, require(&#39;./render&#39;));
+
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, ()=&gt;{
+    console.log(`App listening on port ${PORT}!`)
+});
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:40%;flex-basis:40%;"><div class="current-only fragment dm-code-focus" data-code-focus="1"><p>Install required packages</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="3-7"><p>NodeJS doesn't fully support modern Javascript; in particular <code>imports</code> are not supported.
+'babel-require' is used to avoid this problem and also enable JSX on the server.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14"><p>All requests to the <code>/</code> url will <code>render</code> the application.
+Details of the <code>render</code> handler will be on the next slide.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="15"><p>All static files will be served from the <code>build</code> directory.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="16"><p>All other request will also use the <code>render</code> handler.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Render the application on server</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:50%;flex-basis:50%;"><pre class="dm-code dm-code--view"><strong class="dm-code__filename">ssr/index.js</strong><code class="dm-code__editor hljs javascript">const path = require(&#39;path&#39;);
+const fs = require(&#39;fs&#39;);
+
+const React = require(&#39;react&#39;);
+const {Provider} = require(&#39;react-redux&#39;);
+const {renderToString} = require(&#39;react-dom/server&#39;);
+const {StaticRouter, Route} = require(&#39;react-router-dom&#39;);
+
+const {configureStore} = require(&#39;../src/store/index&#39;);
+const {default: Board} = require(&#39;../src/components/Board/Board&#39;);
+const {default: CardDetails} = require(&#39;../src/components/CardDetails/CardDetails&#39;);
+
+module.exports = function renderApp(req, res) {
+    const filePath = path.resolve(__dirname, &#39;..&#39;, &#39;build&#39;, &#39;index.html&#39;);
+
+    /* get the INITIAL_STATE) */
+
+    fs.readFile(filePath, &#39;utf8&#39;, (err, indexHtml) =&gt; {
+        const store = configureStore(INITIAL_STATE);
+        const markup = renderToString(
+            &lt;Provider store={store}&gt;
+                &lt;StaticRouter location={req.url}&gt;
+                    &lt;div&gt;
+                        &lt;Route component={Board}/&gt;
+                        &lt;Route path=&quot;/details/:id&quot; component={CardDetails} /&gt;
+                    &lt;/div&gt;
+                &lt;/StaticRouter&gt;
+            &lt;/Provider&gt;
+        );
+
+        const App = indexHtml.replace(&#39;{{SSR}}&#39;, markup);
+        res.send(App);
+    });
+};
+
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:50%;flex-basis:50%;"><div class="current-only fragment dm-code-focus" data-code-focus="4-7"><p>Use <code>require</code> to import React and React-related packages</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="6"><p>While client uses the standard <code>ReactDOM.render</code>, the server will use the <code>renderToString</code> method from <code>react-dom/server</code>;</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="7"><p>Similarly, the routing will be handled by <code>StaticRouter</code> instead of the <code>BrowserRouter</code>.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="9-11"><p>Import the <code>configureStore</code> and components requried for routing.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="14"><p>Get the <code>build/index.html</code> file, which is a compiled version of <code>public/index.html</code> file.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="16"><p>Query the database, load files, etc, to create an object representing the initial state of the app.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="21-28"><p>Create a React markup that will handle the routing on the client-side</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="31-32"><p>Inject the markup into the html and send it to client.</p>
+</div></div></div></div></section><section class="dm-slide dm-slide--columns"><div class="dm-slide__content-wrapper"><h3 class="dm-slide__title">Run the server</h3><div class="dm-slide__content"><div class="dm-slide__content__column" style="min-width:40%;flex-basis:40%;"><pre class="dm-code dm-code--view"><code class="dm-code__editor hljs javascript">/** PUBLIC/INDEX.HTML **/
+
+// before
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+
+// now
+&lt;div id=&quot;root&quot;&gt;{{SSR}}&lt;/div&gt;
+
+
+/** CONSOLE **/
+npm run build
+NODE_ENV=production node ssr
+</code></pre></div><div class="dm-slide__content__column l-column-middle" style="min-width:60%;flex-basis:60%;"><div class="current-only fragment dm-code-focus" data-code-focus="1-7"><p>The <code>{{SSR}}</code> token is added to the <code>public/index.html</code> file
+to mark the place for server to render the application.</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="11"><p>The <code>build</code> command uses <code>webpack</code> to prepare a static bundle</p>
+</div><div class="current-only fragment dm-code-focus" data-code-focus="12"><p>Run the server. This assumes that code for the server-side rendering is in the <code>ssr/index.js</code></p>
+</div></div></div></div></section></div></div><script type="text/javascript" src="vendor.bundle_db8f4c613c9b8b1d55a9.js"></script><script type="text/javascript" src="bundle_db8f4c613c9b8b1d55a9.js"></script></body></html>
