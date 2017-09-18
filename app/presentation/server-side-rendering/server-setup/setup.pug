@@ -1,0 +1,36 @@
+extends ~layouts/columns
+
+block title
+    | Creating a NodeJS server
+
+block content
+    +slide_column(60)
+        +code('ssr/index.js', 'javascript')
+            include:escape ./setup.js
+
+    +slide_column(40).l-column-middle
+        +code_focus('1').current-only
+            :markdown-it
+                Install required packages
+
+        +code_focus('3-7').current-only
+            :markdown-it
+                NodeJS doesn't fully support modern Javascript; in particular `imports` are not supported.
+                'babel-require' is used to avoid this problem and also enable JSX on the server.
+
+        +code_focus('14').current-only
+            :markdown-it
+                All requests to the `/` url will `render` the application.
+                Details of the `render` handler will be on the next slide.
+
+
+        +code_focus('15').current-only
+            :markdown-it
+                All static files will be served from the `build` directory.
+
+        +code_focus('16').current-only
+            :markdown-it
+                All other request will also use the `render` handler.
+
+
+

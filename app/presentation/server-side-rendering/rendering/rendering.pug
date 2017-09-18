@@ -1,0 +1,49 @@
+extends ~layouts/columns
+
+block title
+    | Render the application on server
+
+block content
+    +slide_column(50)
+        +code('ssr/index.js', 'javascript')
+            include:escape ./rendering.js
+
+    +slide_column(50).l-column-middle
+        +code_focus('4-7').current-only
+            :markdown-it
+                Use `require` to import React and React-related packages
+
+        +code_focus('6').current-only
+            :markdown-it
+                While client uses the standard `ReactDOM.render`, the server will use the `renderToString` method from `react-dom/server`;
+
+        +code_focus('7').current-only
+            :markdown-it
+                Similarly, the routing will be handled by `StaticRouter` instead of the `BrowserRouter`.
+
+
+        +code_focus('9-11').current-only
+            :markdown-it
+                Import the `configureStore` and components requried for routing.
+
+        +code_focus('14').current-only
+            :markdown-it
+                Get the `build/index.html` file, which is a compiled version of `public/index.html` file.
+
+
+        +code_focus('16').current-only
+            :markdown-it
+                Query the database, load files, etc, to create an object representing the initial state of the app.
+
+        +code_focus('21-28').current-only
+            :markdown-it
+                Create a React markup that will handle the routing on the client-side
+
+
+        +code_focus('31-32').current-only
+            :markdown-it
+                Inject the markup into the html and send it to client.
+
+
+
+

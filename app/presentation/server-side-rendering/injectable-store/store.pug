@@ -1,0 +1,26 @@
+extends ~layouts/columns
+
+block title
+    | Injecting the store with initial state
+
+block content
+    +slide_column(40)
+        +code(null, 'javascript')
+            include:escape ./store.js
+
+    +slide_column(60).l-column-middle
+        +code_focus('2-10').current-only
+            :markdown-it
+                Instead of creating the store immediately, export the `configureStore` function.
+                This will enable the app to dynamically inject the initial state if needed.
+
+        +code_focus('14-16').current-only
+            :markdown-it
+                Store is created in the main app file
+
+        +code_focus('18-26').current-only
+            :markdown-it
+                Rest of the app runs as normal.
+
+
+

@@ -1,0 +1,26 @@
+extends ~layouts/columns
+
+block title
+    | Run the server
+
+block content
+    +slide_column(40)
+        +code(null, 'javascript')
+            include:escape ./running.js
+
+    +slide_column(60).l-column-middle
+        +code_focus('1-7').current-only
+            :markdown-it
+                The `{{SSR}}` token is added to the `public/index.html` file
+                to mark the place for server to render the application.
+
+        +code_focus('11').current-only
+            :markdown-it
+                The `build` command uses `webpack` to prepare a static bundle
+
+        +code_focus('12').current-only
+            :markdown-it
+                Run the server. This assumes that code for the server-side rendering is in the `ssr/index.js`
+
+
+
